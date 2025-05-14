@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  cn.iocoder.yudao.module.system.api.workwe.config.WorkWeChatAutoConfiguration 

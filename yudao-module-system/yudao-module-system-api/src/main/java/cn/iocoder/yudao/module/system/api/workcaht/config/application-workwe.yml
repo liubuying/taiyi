@@ -1,0 +1,12 @@
+# 企业微信配置
+work-wechat:
+  # 企业ID（可选，也可通过数据库配置）
+  corp-id: 
+  # 应用密钥（可选，也可通过数据库配置）
+  corp-secret: 
+  # token缓存过期时间（秒）
+  token-cache-expiry: 7000
+  # 分布式锁过期时间（秒）
+  lock-expiry: 60
+  # 是否启用自动刷新token
+  enable-auto-refresh: true 
