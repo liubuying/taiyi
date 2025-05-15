@@ -107,4 +107,19 @@ public interface RedisKeyConstants {
      */
     String WXA_SUBSCRIBE_TEMPLATE = "wxa_subscribe_template";
 
+    /**
+     * 默认前缀
+     */
+    String DEFAULT_PREFIX ="_";
+
+    /**
+     * 企业微信公司 access_token 常量字符串
+     */
+    String ACCESS_TOKEN_PREFIX =  "access_token";
+
+    /**
+     * 企业微信 jsapi的 jsapi_ticket 常量字符串
+     */
+    String JSAPI_TICKET_PREFIX =  "jsapi_ticket";
+
 }

@@ -52,4 +52,11 @@ public class RedisUtils {
     }
 
 
+    public static String buildKey(String... s) {
+        StringBuffer keyBuffer = new StringBuffer();
+        for (String str : s) {
+            keyBuffer.append(str);
+        }
+        return keyBuffer.toString();
+    }
 }

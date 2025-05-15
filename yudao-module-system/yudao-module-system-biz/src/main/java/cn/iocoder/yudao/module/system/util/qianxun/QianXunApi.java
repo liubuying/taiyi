@@ -1,9 +1,16 @@
 package cn.iocoder.yudao.module.system.util.qianxun;
 
+import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
+import cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -14,10 +21,10 @@ import java.util.Map;
  * 千寻微信框架Pro 接口请求工具类
  */
 @Component
-@Slf4j
-public class QianXunApi {
 
-    static String re = "/qianxun/httpapi";
+public class QianXunApi {
+    private static final Logger log = LoggerFactory.getLogger(QianXunApi.class);
+    static String request_url_path = "/qianxun/httpapi";
 
     /**
      * 发送请求到千寻微信框架接口并处理响应
@@ -33,7 +40,7 @@ public class QianXunApi {
                                                    String wxid, String errorMessage) {
         try {
             // 构建URL
-            String url = ip + re;
+            String url = ip + request_url_path;
             if (wxid != null && !wxid.isEmpty()) {
                 url += "?wxid=" + wxid;
             }
@@ -56,12 +63,16 @@ public class QianXunApi {
             if (responseStr == null || responseStr.trim().isEmpty()) {
                 throw new RuntimeException("服务器返回空响应");
             }
-
-            return JSONObject.parseObject(responseStr,
-                    new TypeReference<Map<String, Object>>(){});
+            Map<String, Object> result = JSON.parseObject(responseStr, new TypeReference<Map<String, Object>>() {
+            });
+            if(result != null && "200".equals(result.get("code"))){
+                return JSON.parseObject(result.get("result").toString(), new TypeReference<Map<String, Object>>() {
+                });
+            }
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.QIANXUN_API_RESULT_ERROR);
         } catch (Exception e) {
             log.error(errorMessage, e);
-            return new HashMap<>();
+            return MapUtil.empty();
         }
     }
 
