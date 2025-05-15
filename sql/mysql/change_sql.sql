@@ -1,4 +1,5 @@
--- 法人信息表
+
+
 CREATE TABLE taiyi_legal_person (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
     name VARCHAR(100) NOT NULL COMMENT '法人姓名',
@@ -7,13 +8,13 @@ CREATE TABLE taiyi_legal_person (
     phone VARCHAR(20) COMMENT '联系电话',
     email VARCHAR(100) COMMENT '电子邮箱',
     company_id BIGINT UNSIGNED UNIQUE COMMENT '关联公司ID',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    FOREIGN KEY (company_id) REFERENCES taiyi_tenant_company(id)
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    FOREIGN KEY (company_id) REFERENCES taiyi_company(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='法人信息表';
 
--- 入驻公司信息表
-CREATE TABLE taiyi_tenant_company (
+
+CREATE TABLE taiyi_company (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
     name VARCHAR(255) NOT NULL COMMENT '公司名称',
     unified_social_credit_code VARCHAR(64) UNIQUE NOT NULL COMMENT '统一社会信用代码',
@@ -27,8 +28,8 @@ CREATE TABLE taiyi_tenant_company (
     exit_date DATE COMMENT '退出日期',
     status TINYINT DEFAULT 1 COMMENT '公司状态：0=退出，1=在营，2=审核中',
     business_license_url VARCHAR(255) COMMENT '营业执照链接',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='入驻公司信息表';
 
 -- 域名管理表
@@ -38,22 +39,20 @@ CREATE TABLE taiyi_domain_name (
     status TINYINT DEFAULT 1 COMMENT '状态：1=启用，0=禁用',
     company_id BIGINT UNSIGNED NOT NULL COMMENT '所属公司ID',
     operator_id BIGINT UNSIGNED NOT NULL COMMENT '操作人ID',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    FOREIGN KEY (company_id) REFERENCES taiyi_tenant_company(id),
-    FOREIGN KEY (operator_id) REFERENCES system_users(id)
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='域名管理表';
 
 
 -- 公司与员工微绑定关系
-CREATE TABLE taiyi_tenant_company_user_relation (
+CREATE TABLE taiyi_company_user_relation (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
     company_id BIGINT UNSIGNED NOT NULL COMMENT '公司ID',
     user_id BIGINT UNSIGNED NOT NULL COMMENT '员工ID',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    FOREIGN KEY (company_id) REFERENCES taiyi_tenant_company(id),
-    FOREIGN KEY (user_id) REFERENCES system_users(id)
+    user_name VARCHAR(128)   COMMENT '员工名称',
+    operator_id BIGINT UNSIGNED NOT NULL COMMENT '操作人ID',
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='入驻公司信息表';
 
 
@@ -70,38 +69,34 @@ CREATE TABLE taiyi_wx_account_pool  (
     nick_name VARCHAR(20) COMMENT '备注',
     avatar VARCHAR(255) COMMENT '头像',
     expire_time DATETIME COMMENT '过期时间',
-    is_expire BOOLEAN DEFAULT FALSE COMMENT '是否过期',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    FOREIGN KEY (company_id) REFERENCES taiyi_tenant_company(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客服账号';
+    operator_id BIGINT UNSIGNED NOT NULL COMMENT '操作人ID',
+    is_expired TINYINT DEFAULT 0 COMMENT '是否过期 0 未过期 1 过期',
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='微信池账号';
 
 -- 微信账号与域名绑定关系
 CREATE TABLE taiyi_domain_wx_account_relation (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '主键 ID',
-    account_id BIGINT UNSIGNED NOT NULL COMMENT '账号池 ID',
+    union_id VARCHAR(32) NOT NULL COMMENT '账号unionId',
     domain_id BIGINT UNSIGNED NOT NULL COMMENT  '域名管理 ID',
     status TINYINT DEFAULT 1 COMMENT '状态：0=禁用，1=启用',
-    assigned_by BIGINT UNSIGNED COMMENT '修改人',
-    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '分配时间',
-    FOREIGN KEY (domain_id) REFERENCES taiyi_domain_name(id),
-    FOREIGN KEY (account_id) REFERENCES taiyi_wx_account_pool(id),
-    FOREIGN KEY (assigned_by) REFERENCES system_users(id)
+    operator_id BIGINT UNSIGNED COMMENT '修改人',
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='域名与微信账号关系表';
 
 -- 员工与微信账号的绑定关系
 CREATE TABLE taiyi_users_wx_account_relation (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '主键 ID',
     employee_id BIGINT UNSIGNED NOT NULL COMMENT '员工 ID',
-    account_id BIGINT UNSIGNED NOT NULL COMMENT '账号池 ID',
-    is_primary BOOLEAN DEFAULT FALSE COMMENT '是否为主用账号',
+    union_id VARCHAR(32) NOT NULL COMMENT '账号union ID',
     status TINYINT DEFAULT 1 COMMENT '状态：0=禁用，1=启用',
-    assigned_by BIGINT UNSIGNED COMMENT '分配人（系统账号 ID）',
-    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '分配时间',
-    FOREIGN KEY (employee_id) REFERENCES system_users(id),
-    FOREIGN KEY (account_id) REFERENCES taiyi_wx_account_pool(id),
-    FOREIGN KEY (assigned_by) REFERENCES system_users(id)
+    operator_id BIGINT UNSIGNED COMMENT '修改人',
+    gmt_create DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='员工与微信账号关系表';
+
 
 
 
