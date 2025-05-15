@@ -31,7 +31,7 @@ public class WecomController {
      *
      * @return access_token
      */
-    @RequestMapping(name = " ",  method = RequestMethod.POST)
+    @RequestMapping(name = "getJsApiInfo",  method = RequestMethod.POST)
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public CommonResult<JsApiInfoVO> getJsApiInfo(@RequestBody JsApiInfoRequest request) {
         try {

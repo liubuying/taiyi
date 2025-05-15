@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * 千寻微信框架Pro 接口请求工具类
  */
-@Component
 
 public class QianXunApi {
     private static final Logger log = LoggerFactory.getLogger(QianXunApi.class);
