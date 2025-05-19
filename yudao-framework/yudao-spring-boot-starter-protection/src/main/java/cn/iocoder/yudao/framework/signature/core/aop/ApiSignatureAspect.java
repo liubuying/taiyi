@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstant
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.signature.core.annotation.ApiSignature;
 import cn.iocoder.yudao.framework.signature.core.redis.ApiSignatureRedisDAO;
+import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyWrapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -18,6 +19,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -135,11 +137,24 @@ public class ApiSignatureAspect {
     private String buildSignatureString(ApiSignature signature, HttpServletRequest request, String appSecret) {
         SortedMap<String, String> parameterMap = getRequestParameterMap(request); // 请求头
         SortedMap<String, String> headerMap = getRequestHeaderMap(signature, request); // 请求参数
-        String requestBody = StrUtil.nullToDefault(ServletUtils.getBody(request), ""); // 请求体
+        String requestBody = StrUtil.nullToDefault(getBody(request), ""); // 请求体
         return MapUtil.join(parameterMap, "&", "=")
                 + requestBody
                 + MapUtil.join(headerMap, "&", "=")
                 + appSecret;
+    }
+
+    private String getBody(HttpServletRequest request){
+        if (ServletUtils.isJsonRequest(request)) {
+            // 如果请求已被包装为 CacheRequestBodyWrapper，直接读取缓存
+            if (request instanceof CacheRequestBodyWrapper) {
+                CacheRequestBodyWrapper wrapper = (CacheRequestBodyWrapper) request;
+                return new String(wrapper.getCachedBody(), StandardCharsets.UTF_8);
+            }
+            // 否则尝试直接读取（应仅在 Filter 未生效时发生）
+            return ServletUtils.getBody(request);
+        }
+        return null;
     }
 
     /**

@@ -6,26 +6,28 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  *  Request Body 缓存 Wrapper
  *
- * @author 芋道源码
+ *
  */
 public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
     /**
      * 缓存的内容
      */
-    private final byte[] body;
+    private byte[] body;
 
     public CacheRequestBodyWrapper(HttpServletRequest request) {
         super(request);
-        body = ServletUtils.getBodyBytes(request);
+        try {
+            body = ServletUtils.getBodyBytes(request);
+        }catch (Exception e){
+            body = new byte[0];
+        }
+
     }
 
     @Override
@@ -35,12 +37,12 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        final ByteArrayInputStream inputStream = new ByteArrayInputStream(body);
+
         // 返回 ServletInputStream
         return new ServletInputStream() {
-
+            final InputStream inputStream = new ByteArrayInputStream(body);
             @Override
-            public int read() {
+            public int read() throws IOException {
                 return inputStream.read();
             }
 
@@ -51,7 +53,7 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
             @Override
             public boolean isReady() {
-                return false;
+                return true;
             }
 
             @Override
@@ -63,6 +65,14 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
             }
 
         };
+    }
+    @Override
+    public java.util.Enumeration<String> getHeaders(String name) {
+        return super.getHeaders(name);
+    }
+
+    public byte[] getCachedBody() {
+        return body;
     }
 
 }

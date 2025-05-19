@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.system.util.qianxun.QianXunApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,7 +25,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 
 @Tag(name = "管理后台 - 微信账号管理")
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/system/wechat")
 public class WeChatQueryController {
 
@@ -50,30 +51,19 @@ public class WeChatQueryController {
     @Operation(summary = "获取微信验证码")
     @ApiAccessLog(operateType = GET)
     public CommonResult<String> getQrCode(@RequestBody Object request) {
-
-        try {
-            CommonResult<AdminUserDO> userResult = getUser();
-            if(!userResult.isSuccess()){
-                return CommonResult.error(userResult.getCode(), userResult.getMsg());
-            }
-            AdminUserDO userDO = userResult.getData();
-            // 查询 登录人下管理的微信列表
-            List<Object> objectList = weChatService.queryManageWechatList(getLoginUserId());
-            if(objectList == null || objectList.isEmpty()){
-                return CommonResult.error(500, "未找到可用的微信账号");
-            }
-            // 获取域名
-            Object o = objectList.get(0);
-            String domain = o.toString();
-            Map<String, Object> loginQrCode = QianXunApi.getLoginQrCode(domain);
-            if (loginQrCode == null || !loginQrCode.containsKey("result")) {
-                return CommonResult.error(500, "获取二维码失败");
-            }
-            return CommonResult.success(loginQrCode.get("result").toString());
-        } catch (Exception e) {
-            log.error("获取微信二维码异常", e);
-            return CommonResult.error(500, "获取微信二维码异常: " + e.getMessage());
+        CommonResult<AdminUserDO> userResult = getUser();
+        if(userResult.isSuccess()){
+            return CommonResult.error(userResult);
         }
+        AdminUserDO userDO = userResult.getCheckedData();
+        // 查询 登录人下管理的微信列表
+        List<Object> objectList = weChatService.queryManageWechatList(getLoginUserId());
+
+        // 获取域名
+        Object o = objectList.get(0);
+        String domain = o.toString();
+        Map<String, Object> loginQrCode = QianXunApi.getLoginQrCode(domain);
+        return CommonResult.success(loginQrCode.get("result").toString());
 
     }
 

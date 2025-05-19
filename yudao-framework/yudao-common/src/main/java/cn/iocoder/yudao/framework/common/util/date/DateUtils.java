@@ -2,6 +2,8 @@ package cn.iocoder.yudao.framework.common.util.date;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,7 +11,7 @@ import java.util.Date;
 /**
  * 时间工具类
  *
- * @author 芋道源码
+ *
  */
 public class DateUtils {
 
@@ -43,6 +45,17 @@ public class DateUtils {
         Instant instant = zonedDateTime.toInstant();
         // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
         return Date.from(instant);
+    }
+
+    /**
+     * String 转为 Date
+     */
+    public static Date of(String dateStr, String pattern) throws ParseException {
+        if (dateStr == null || pattern == null) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        return sdf.parse(dateStr);
     }
 
     /**

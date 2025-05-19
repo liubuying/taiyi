@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.FilePresigned
 /**
  * 文件客户端
  *
- * @author 芋道源码
+ *
  */
 public interface FileClient {
 

@@ -4,14 +4,10 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.TypeReference;
-import com.google.common.collect.Maps;
-import lombok.extern.slf4j.Slf4j;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +49,7 @@ public class QianXunApi {
             reqDataMap.put("data", data != null ? data : new HashMap<>());
 
             // 将请求体转为JSON字符串
-            String requestBody = JSONObject.toJSONString(reqDataMap);
+            String requestBody = JSON.toJSONString(reqDataMap);
 
             // 发送POST请求并获取响应
             String responseStr = HttpUtils.post(url, headers, requestBody);

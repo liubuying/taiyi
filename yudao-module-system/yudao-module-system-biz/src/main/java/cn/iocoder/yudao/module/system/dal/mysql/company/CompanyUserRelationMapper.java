@@ -6,19 +6,17 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.company.CompanyUserRelationDO;
-import cn.iocoder.yudao.module.taiyi.dal.dataobject.companyuserrelation.CompanyUserRelationDO;
-import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.taiyi.controller.admin.companyuserrelation.vo.*;
 
+import org.apache.ibatis.annotations.Mapper;
 /**
  * 入驻公司信息 Mapper
  *
- * @author 芋道源码
+ *
  */
 @Mapper
 public interface CompanyUserRelationMapper extends BaseMapperX<CompanyUserRelationDO> {
 
-    default PageResult<CompanyUserRelationDO> selectPage(CompanyUserRelationPageReqVO reqVO) {
+    /*default PageResult<CompanyUserRelationDO> selectPage(CompanyUserRelationPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CompanyUserRelationDO>()
                 .eqIfPresent(CompanyUserRelationDO::getCompanyId, reqVO.getCompanyId())
                 .eqIfPresent(CompanyUserRelationDO::getUserId, reqVO.getUserId())
@@ -27,6 +25,6 @@ public interface CompanyUserRelationMapper extends BaseMapperX<CompanyUserRelati
                 .eqIfPresent(CompanyUserRelationDO::getGmtCreate, reqVO.getGmtCreate())
                 .eqIfPresent(CompanyUserRelationDO::getGmtModified, reqVO.getGmtModified())
                 .orderByDesc(CompanyUserRelationDO::getId));
-    }
+    }*/
 
 }

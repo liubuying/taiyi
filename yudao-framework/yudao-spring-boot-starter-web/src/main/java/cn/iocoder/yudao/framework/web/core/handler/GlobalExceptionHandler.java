@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyWrapper;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.infra.api.logger.ApiErrorLogApi;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 /**
  * 全局异常处理器，将 Exception 翻译成 CommonResult + 对应的异常编号
  *
- * @author 芋道源码
+ * 
  */
 @RestControllerAdvice
 @AllArgsConstructor
@@ -327,12 +329,25 @@ public class GlobalExceptionHandler {
         errorLog.setRequestUrl(request.getRequestURI());
         Map<String, Object> requestParams = MapUtil.<String, Object>builder()
                 .put("query", ServletUtils.getParamMap(request))
-                .put("body", ServletUtils.getBody(request)).build();
+                .put("body", getBody(request)).build();
         errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
         errorLog.setRequestMethod(request.getMethod());
         errorLog.setUserAgent(ServletUtils.getUserAgent(request));
         errorLog.setUserIp(ServletUtils.getClientIP(request));
         errorLog.setExceptionTime(LocalDateTime.now());
+    }
+
+    private String getBody(HttpServletRequest request){
+        if (ServletUtils.isJsonRequest(request)) {
+            // 如果请求已被包装为 CacheRequestBodyWrapper，直接读取缓存
+            if (request instanceof CacheRequestBodyWrapper) {
+                CacheRequestBodyWrapper wrapper = (CacheRequestBodyWrapper) request;
+                return new String(wrapper.getCachedBody(), StandardCharsets.UTF_8);
+            }
+            // 否则尝试直接读取（应仅在 Filter 未生效时发生）
+            return ServletUtils.getBody(request);
+        }
+        return null;
     }
 
     /**
