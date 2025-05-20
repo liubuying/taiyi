@@ -1,12 +1,6 @@
 package cn.iocoder.yudao.module.system.dal.dataobject;
 
-
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import org.apache.ibatis.type.JdbcType;
-
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
