@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.system.dal.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import lombok.Data;
+
 import java.util.Date;
 
 /**
  * 基础实现类
  */
+@Data
 public abstract class BaseDO {
 
     /**
