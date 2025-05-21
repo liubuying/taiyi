@@ -32,6 +32,6 @@ public abstract class BaseDO {
      * 是否删除
      */
     @TableLogic
-    private Boolean deleted;
+    private Integer deleted;
 
 }

@@ -19,4 +19,14 @@ public interface WxAccountPoolService {
     void saveWxAccountPool(WxAccountPoolVO wxAccountPoolVO);
 
     void deleteWxAccountPool(WxAccountPoolVO wxAccountPoolVO);
+
+
+    Boolean bindDomainUrl(WxAccountPoolVO wxAccountPoolVO);
+
+    Boolean unBindDomainUrl(WxAccountPoolVO wxAccountPoolVO);
+
+    Boolean bindEmployee(WxAccountPoolVO wxAccountPoolVO);
+
+    Boolean unBindEmployee(WxAccountPoolVO wxAccountPoolVO);
+
 }

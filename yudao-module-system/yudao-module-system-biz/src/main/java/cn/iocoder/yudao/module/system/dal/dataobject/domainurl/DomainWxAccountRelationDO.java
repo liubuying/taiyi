@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.domainurl;
 
+import cn.iocoder.yudao.module.system.dal.dataobject.BaseDO;
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+
 
 /**
  * 域名与微信账号关系 DO
@@ -43,13 +41,5 @@ public class DomainWxAccountRelationDO extends BaseDO {
      * 修改人
      */
     private Long operatorId;
-    /**
-     * 创建时间
-     */
-    private LocalDateTime gmtCreate;
-    /**
-     * 更新时间
-     */
-    private LocalDateTime gmtModified;
 
 }

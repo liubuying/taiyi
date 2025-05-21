@@ -192,6 +192,7 @@ yudao:
       - system_mail_log
       - system_notify_template
       - system_
+      - taiyi_domain_name
     ignore-caches:
       - user_role_ids
       - permission_menu_ids

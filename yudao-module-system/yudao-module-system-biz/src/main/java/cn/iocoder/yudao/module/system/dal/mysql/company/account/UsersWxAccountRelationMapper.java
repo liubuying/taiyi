@@ -14,15 +14,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UsersWxAccountRelationMapper extends BaseMapperX<UsersWxAccountRelationDO> {
 
- /*   default PageResult<UsersWxAccountRelationDO> selectPage(UsersWxAccountRelationPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<UsersWxAccountRelationDO>()
-                .eqIfPresent(UsersWxAccountRelationDO::getEmployeeId, reqVO.getEmployeeId())
-                .eqIfPresent(UsersWxAccountRelationDO::getUnionId, reqVO.getUnionId())
-                .eqIfPresent(UsersWxAccountRelationDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(UsersWxAccountRelationDO::getOperatorId, reqVO.getOperatorId())
-                .eqIfPresent(UsersWxAccountRelationDO::getGmtCreate, reqVO.getGmtCreate())
-                .eqIfPresent(UsersWxAccountRelationDO::getGmtModified, reqVO.getGmtModified())
-                .orderByDesc(UsersWxAccountRelationDO::getId));
-    }*/
 
 }

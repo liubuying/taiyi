@@ -33,7 +33,7 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
 
     @Override
     public void saveWxAccountPool(WxAccountPoolVO wxAccountPoolVO) {
-        log.info("添加/修改账号池分页数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
+        log.info("添加/修改账号池数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
         try {
             if(wxAccountPoolVO == null){
                 return;
@@ -45,13 +45,13 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
             }
             wxAccountDomainRepository.saveWxAccountPool(wxAccountPool);
         } catch (Exception e) {
-            log.error("查询账号池分页数据发生错误,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+            log.error("添加/修改账号池数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
         }
     }
 
     @Override
     public void deleteWxAccountPool(WxAccountPoolVO wxAccountPoolVO) {
-        log.info("删除账号池分页数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
+        log.info("删除账号池数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
         try {
             if(wxAccountPoolVO == null){
                 return;
@@ -60,7 +60,71 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
             BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
             wxAccountDomainRepository.deleteWxAccountPoolById(wxAccountPool);
         } catch (Exception e) {
-            log.error("查询账号池分页数据发生错误,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+            log.error("删除账号池数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
         }
+    }
+
+    @Override
+    public Boolean bindDomainUrl(WxAccountPoolVO wxAccountPoolVO) {
+        log.info("绑定账号池域名数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
+        try {
+            if(wxAccountPoolVO == null){
+                return false;
+            }
+            WxAccountPool wxAccountPool = new WxAccountPool();
+            BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
+            return wxAccountDomainRepository.bindDomainUrl(wxAccountPool);
+        } catch (Exception e) {
+            log.error("绑定账号池数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean unBindDomainUrl(WxAccountPoolVO wxAccountPoolVO) {
+        log.info("解绑账号池域名数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
+        try {
+            if(wxAccountPoolVO == null){
+                return false;
+            }
+            WxAccountPool wxAccountPool = new WxAccountPool();
+            BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
+            return wxAccountDomainRepository.unBindDomainUrl(wxAccountPool);
+        } catch (Exception e) {
+            log.error("绑定账号池数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean bindEmployee(WxAccountPoolVO wxAccountPoolVO) {
+        log.info("绑定账号池和员工数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
+        try {
+            if(wxAccountPoolVO == null){
+                return false;
+            }
+            WxAccountPool wxAccountPool = new WxAccountPool();
+            BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
+            wxAccountDomainRepository.bindEmployee(wxAccountPool);
+        } catch (Exception e) {
+            log.error("绑定账号池和员工数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean unBindEmployee(WxAccountPoolVO wxAccountPoolVO) {
+        log.info("解绑账号池和员工数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
+        try {
+            if(wxAccountPoolVO == null){
+                return false;
+            }
+            WxAccountPool wxAccountPool = new WxAccountPool();
+            BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
+            wxAccountDomainRepository.unBindEmployee(wxAccountPool);
+        } catch (Exception e) {
+            log.error("绑定账号池数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+        }
+        return null;
     }
 }

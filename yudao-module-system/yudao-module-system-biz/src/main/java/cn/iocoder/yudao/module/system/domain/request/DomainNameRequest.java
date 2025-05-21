@@ -23,6 +23,8 @@ public class DomainNameRequest extends PageParam  implements Serializable {
     private static final long serialVersionUID = -1670442185569231857L;
     private String domainName;
 
+    private String domain;
+
     private String domainType;
 
     private String domainStatus;

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.domain.repository.wxpool;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlVO;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
 
@@ -23,8 +24,11 @@ public interface WxAccountDomainRepository {
     void deleteWxAccountPoolById(WxAccountPool wxAccountPool);
 
 
-    /**
-     * 关联员工账号
-     */
-    void bindAccount();
+    Boolean bindDomainUrl(WxAccountPool wxAccountPool);
+
+    Boolean unBindDomainUrl(WxAccountPool wxAccountPool);
+
+    Boolean bindEmployee(WxAccountPool wxAccountPool);
+
+    Boolean unBindEmployee(WxAccountPool wxAccountPool);
 }

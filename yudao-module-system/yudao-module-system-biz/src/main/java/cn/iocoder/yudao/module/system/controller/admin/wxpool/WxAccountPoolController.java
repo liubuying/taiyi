@@ -133,6 +133,90 @@ public class WxAccountPoolController {
         }
     }
 
+    @PostMapping("/bindDomainUrl")
+    @Operation(summary = "绑定域名")
+    public CommonResult<Boolean> bindDomainUrl(@RequestBody WxAccountPoolVO wxAccountPoolVO) {
+        WxAccountPoolRequest request = new WxAccountPoolRequest();
+        try {
+            Long loginUserId = getLoginUserId();
+            AdminUserDO user = userService.getUser(loginUserId);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(loginUserId);
+            userInfo.setUserName(user.getUsername());
+            userInfo.setOperationTime(new Date());
+            wxAccountPoolVO.setOperator(userInfo);
+            wxAccountPoolService.bindDomainUrl(wxAccountPoolVO);
+            return CommonResult.success(true);
+        } catch (Exception e) {
+            log.info("查询微信池账号异常,param:{},e:{}",JSON.toJSONString(request), Throwables.getStackTraceAsString(e));
+            return CommonResult.error(9999,"系统异常");
+        }
+    }
+
+    @PostMapping("/unBindDomainUrl")
+    @Operation(summary = "解绑域名")
+    public CommonResult<Boolean> unBindDomainUrl(@RequestBody WxAccountPoolVO wxAccountPoolVO) {
+        WxAccountPoolRequest request = new WxAccountPoolRequest();
+        try {
+            Long loginUserId = getLoginUserId();
+            AdminUserDO user = userService.getUser(loginUserId);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(loginUserId);
+            userInfo.setUserName(user.getUsername());
+            userInfo.setOperationTime(new Date());
+            wxAccountPoolVO.setOperator(userInfo);
+            wxAccountPoolService.unBindDomainUrl(wxAccountPoolVO);
+            return CommonResult.success(true);
+        } catch (Exception e) {
+            log.info("查询微信池账号异常,param:{},e:{}",JSON.toJSONString(request), Throwables.getStackTraceAsString(e));
+            return CommonResult.error(9999,"系统异常");
+        }
+    }
+
+
+
+
+    @PostMapping("/bindEmployee")
+    @Operation(summary = "绑定域名")
+    public CommonResult<Boolean> bindEmployee(@RequestBody WxAccountPoolVO wxAccountPoolVO) {
+        WxAccountPoolRequest request = new WxAccountPoolRequest();
+        try {
+            Long loginUserId = getLoginUserId();
+            AdminUserDO user = userService.getUser(loginUserId);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(loginUserId);
+            userInfo.setUserName(user.getUsername());
+            userInfo.setOperationTime(new Date());
+            wxAccountPoolVO.setOperator(userInfo);
+            wxAccountPoolService.bindDomainUrl(wxAccountPoolVO);
+            return CommonResult.success(true);
+        } catch (Exception e) {
+            log.info("查询微信池账号异常,param:{},e:{}",JSON.toJSONString(request), Throwables.getStackTraceAsString(e));
+            return CommonResult.error(9999,"系统异常");
+        }
+    }
+
+    @PostMapping("/unBindEmployee")
+    @Operation(summary = "解绑域名")
+    public CommonResult<Boolean> unBindEmployee(@RequestBody WxAccountPoolVO wxAccountPoolVO) {
+        WxAccountPoolRequest request = new WxAccountPoolRequest();
+        try {
+            Long loginUserId = getLoginUserId();
+            AdminUserDO user = userService.getUser(loginUserId);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(loginUserId);
+            userInfo.setUserName(user.getUsername());
+            userInfo.setOperationTime(new Date());
+            wxAccountPoolVO.setOperator(userInfo);
+            wxAccountPoolService.unBindDomainUrl(wxAccountPoolVO);
+            return CommonResult.success(true);
+        } catch (Exception e) {
+            log.info("查询微信池账号异常,param:{},e:{}",JSON.toJSONString(request), Throwables.getStackTraceAsString(e));
+            return CommonResult.error(9999,"系统异常");
+        }
+    }
+
+
 
 
 }

@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.system.domain.repository.wxpool;
 
+import cn.iocoder.yudao.framework.common.exception.ServerException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.dal.dataobject.company.account.UsersWxAccountRelationDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.company.account.WxAccountPoolDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.domainurl.DomainNameDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.domainurl.DomainWxAccountRelationDO;
+import cn.iocoder.yudao.module.system.dal.mysql.company.account.DomainWxAccountRelationMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.company.account.UsersWxAccountRelationMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.company.account.WxAccountPoolMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.domain.convert.UserInfoConvert;
 import cn.iocoder.yudao.module.system.domain.enums.AccountTypeEnum;
 import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
@@ -13,7 +18,10 @@ import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
 import cn.iocoder.yudao.module.system.domain.repository.adminuser.EmployeeDomainRepository;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
+import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,7 +46,14 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
     private UsersWxAccountRelationMapper usersWxAccountRelationMapper;
 
     @Resource
+    private AdminUserMapper adminUserMapper;
+
+    @Resource
+    private DomainWxAccountRelationMapper domainWxAccountRelationMapper;
+
+    @Resource
     private EmployeeDomainRepository employeeDomainRepository;
+
 
     @Override
     public PageResult<WxAccountPool> queryWxAccountPoolForPage(WxAccountPoolRequest wxAccountPoolRequest) {
@@ -116,7 +131,89 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
     }
 
     @Override
-    public void bindAccount() {
+    public Boolean bindDomainUrl(WxAccountPool wxAccountPool) {
+        if (StringUtils.isBlank(wxAccountPool.getUnionId())) {
+            log.info("绑定域名 wxId参数为空");
+            return false;
+        }
+        // 账号和域名绑定
+        List<DomainWxAccountRelationDO> domainWxAccountRelationDOS = domainWxAccountRelationMapper.selectList(DomainWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
+                DomainWxAccountRelationDO::getDeleted, YesOrNoEnum.NO.getStatus());
+        if(CollectionUtils.isNotEmpty(domainWxAccountRelationDOS)){
+            return true;
+        }
 
+        DomainWxAccountRelationDO relationDO = new DomainWxAccountRelationDO();
+        relationDO.setUnionId(wxAccountPool.getUnionId());
+        relationDO.setDomainId(wxAccountPool.getDomainName().getId());
+        relationDO.setStatus(YesOrNoEnum.NO.getStatus());
+        relationDO.setOperatorId(wxAccountPool.getOperator().getUserId());
+        relationDO.setCreatorId(wxAccountPool.getOperator().getUserId());
+        relationDO.setDeleted(YesOrNoEnum.NO.getStatus());
+        int insert = domainWxAccountRelationMapper.insert(relationDO);
+        return insert > 0;
+    }
+
+    @Override
+    public Boolean unBindDomainUrl(WxAccountPool wxAccountPool) {
+        if (StringUtils.isBlank(wxAccountPool.getUnionId())
+                || wxAccountPool.getOperator() == null
+                || wxAccountPool.getEmployeeUser() == null) {
+            log.info("绑定域名 wxId参数为空");
+            return false;
+        }
+
+        DomainWxAccountRelationDO relationDO = domainWxAccountRelationMapper.selectOne(DomainWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
+                DomainWxAccountRelationDO::getDomainId, wxAccountPool.getDomainName().getId(),
+                DomainWxAccountRelationDO::getDeleted, YesOrNoEnum.NO.getStatus());
+        if(relationDO == null){
+            log.error("未查到绑定数据");
+            throw new ServerException(ErrorCodeConstants.DATA_NOT_EXISTS);
+        }
+        relationDO.setDeleted(YesOrNoEnum.YES.getStatus());
+        return domainWxAccountRelationMapper.updateById(relationDO) > 0;
+    }
+
+    @Override
+    public Boolean bindEmployee(WxAccountPool wxAccountPool) {
+        if (StringUtils.isBlank(wxAccountPool.getUnionId())
+                || wxAccountPool.getOperator() == null
+                || wxAccountPool.getEmployeeUser() == null) {
+            log.info("绑定域名 wxId参数为空");
+            return false;
+        }
+        // 账号和域名绑定
+        List<UsersWxAccountRelationDO> usersWxAccountRelationDOS = usersWxAccountRelationMapper.selectList(UsersWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
+                UsersWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
+        if(CollectionUtils.isNotEmpty(usersWxAccountRelationDOS)){
+            log.info("wxId已绑定,wxId:{}",wxAccountPool.getUnionId());
+            return true;
+        }
+        UsersWxAccountRelationDO usersWxAccountRelationDO = new UsersWxAccountRelationDO();
+        usersWxAccountRelationDO.setEmployeeId(wxAccountPool.getEmployeeUser().getUserId());
+        usersWxAccountRelationDO.setUnionId(wxAccountPool.getUnionId());
+        usersWxAccountRelationDO.setStatus(YesOrNoEnum.NO.getStatus());
+        usersWxAccountRelationDO.setOperatorId(wxAccountPool.getOperator().getUserId());
+        return usersWxAccountRelationMapper.insert(usersWxAccountRelationDO) > 1;
+    }
+
+    @Override
+    public Boolean unBindEmployee(WxAccountPool wxAccountPool) {
+        if (StringUtils.isBlank(wxAccountPool.getUnionId())
+                || wxAccountPool.getOperator() == null
+                || wxAccountPool.getEmployeeUser() == null) {
+            log.info("解绑域名 wxId参数为空");
+            return false;
+        }
+        // 账号和域名绑定
+        UsersWxAccountRelationDO usersWxAccountRelation = usersWxAccountRelationMapper.selectOne(UsersWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
+                UsersWxAccountRelationDO::getEmployeeId, wxAccountPool.getEmployeeUser().getUserId(),
+                UsersWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
+        if(usersWxAccountRelation == null){
+            log.info("wxId未绑定,wxId:{}",wxAccountPool.getUnionId());
+            throw new ServerException(ErrorCodeConstants.DATA_NOT_EXISTS);
+        }
+        usersWxAccountRelation.setStatus(YesOrNoEnum.YES.getStatus());
+        return usersWxAccountRelationMapper.updateById(usersWxAccountRelation) > 1;
     }
 }

@@ -27,6 +27,13 @@ public class DomainNameDO extends BaseDO {
      * 绑定域名
      */
     private String domainName;
+
+    /**
+     * 绑定域名
+     */
+    private String domain;
+
+    private String domainDesc;
     /**
      * 状态：1=启用，0=禁用
      */

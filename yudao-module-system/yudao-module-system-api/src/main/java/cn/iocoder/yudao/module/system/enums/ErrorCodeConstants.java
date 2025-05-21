@@ -181,4 +181,6 @@ public interface ErrorCodeConstants {
     ErrorCode LEGAL_PERSON_CERT_NO_EXISTS = new ErrorCode(1_002_133_001, "证件号码已存在");
 
     // ========== 千寻 1-002-068-000 ==========
+    ErrorCode DATA_NOT_EXISTS = new ErrorCode(1_003_001_001, "数据不存在");
+
 }

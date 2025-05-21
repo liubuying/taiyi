@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "wx - 用户")
 @RestController
-@RequestMapping("/api/wx/")
+@RequestMapping("/system/api/wx")
 @Validated
 public class WxFrinendController {
 
@@ -38,7 +38,7 @@ public class WxFrinendController {
 
 
     @PermitAll
-    @PostMapping("pageFriendList")
+    @PostMapping("/pageFriendList")
     public CommonResult<PageResult<WxFriendVO>> getUserPage(@RequestBody WxQueryDTO pageReqVO) {
         // 获得用户分页列表
         return wxFriendService.queryFriendDataList(pageReqVO);

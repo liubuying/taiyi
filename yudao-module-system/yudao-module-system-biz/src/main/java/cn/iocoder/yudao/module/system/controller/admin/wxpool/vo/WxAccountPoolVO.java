@@ -42,4 +42,9 @@ public class WxAccountPoolVO implements Serializable {
     private String expireTime;
     private int deleted;
 
+    /**
+     * 绑定员工
+     */
+    private UserInfo employeeUser;
+
 }

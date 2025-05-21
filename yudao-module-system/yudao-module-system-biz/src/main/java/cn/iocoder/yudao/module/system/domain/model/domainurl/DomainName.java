@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.domain.model.domainurl;
 
+import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
 import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
 import lombok.Data;
 
@@ -18,7 +19,13 @@ public class DomainName implements Serializable {
 
     private String domainName;
 
+    private String domain;
+
+    private String domainDesc;
+
     private String domainStatus;
+
+    private Integer deleted;
 
     private UserInfo creator;
 

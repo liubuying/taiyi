@@ -23,6 +23,9 @@ public interface WxDomainUrlConvert {
     @Mapping(source = "status", target = "domainStatus")
     DomainName convert(DomainNameDO domainNameDO);
 
+    @Mapping(source = "domainStatus", target = "status")
+    DomainNameDO convert(DomainName domainNameDO);
+
 
     default List<DomainName> convertList(List<DomainNameDO> domainNameDOList, Map<Long, UserInfo> userInfoMap) {
         return domainNameDOList.stream()

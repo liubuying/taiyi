@@ -15,12 +15,11 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 @TableName("taiyi_users_wx_account_relation")
 @KeySequence("taiyi_users_wx_account_relation_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersWxAccountRelationDO extends BaseDO {
+public class UsersWxAccountRelationDO{
 
     /**
      * 主键 ID
@@ -46,10 +45,10 @@ public class UsersWxAccountRelationDO extends BaseDO {
     /**
      * 创建时间
      */
-    private LocalDateTime gmtCreate;
+    private Date gmtCreate;
     /**
      * 更新时间
      */
-    private LocalDateTime gmtModified;
+    private Date gmtModified;
 
 }

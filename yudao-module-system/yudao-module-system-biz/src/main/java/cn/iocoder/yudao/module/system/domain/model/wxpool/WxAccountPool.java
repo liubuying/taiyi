@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.system.domain.enums.AccountTypeEnum;
 import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
 import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
+import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -78,6 +79,16 @@ public class WxAccountPool{
      * 更新时间
      */
     private Date gmtModified;
+
+    /**
+     * 域名绑定IP
+     */
+    private DomainName domainName;
+
+    /**
+     * 绑定员工
+     */
+    private UserInfo employeeUser;
 
 
 }

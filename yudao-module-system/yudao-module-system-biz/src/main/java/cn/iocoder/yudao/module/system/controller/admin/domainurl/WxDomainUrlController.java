@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlVO;
+import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
 import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,9 +46,18 @@ public class WxDomainUrlController {
     }
 
 
-    @PostMapping
+    @PostMapping("/saveDomainInfo")
     public CommonResult<Boolean> saveWxDomainUrl(@RequestBody WxDomainUrlVO wxDomainUrlVO) {
         try {
+            Long loginUserId = getLoginUserId();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(loginUserId);
+            userInfo.setOperationTime(new Date());
+            if(wxDomainUrlVO.getId() != null){
+                wxDomainUrlVO.setOperator(userInfo);
+            } else {
+                wxDomainUrlVO.setCreator(userInfo);
+            }
             wxDomainUrlService.saveDomainUrl(wxDomainUrlVO);
             return CommonResult.success(true);
         }catch (Exception e){
@@ -64,11 +75,14 @@ public class WxDomainUrlController {
             }
             WxDomainUrlVO wxDomainUrlVO = new WxDomainUrlVO();
             Long loginUserId = getLoginUserId();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserId(loginUserId);
+            userInfo.setOperationTime(new Date());
             if (ObjectUtil.isNull(loginUserId)) {
                 return CommonResult.error(ErrorCodeConstants.USER_NOT_EXISTS);
             }
             wxDomainUrlVO.setId(id);
-            wxDomainUrlVO.setOperatorId(loginUserId);
+            wxDomainUrlVO.setOperator(userInfo);
             return wxDomainUrlService.deleteDomainUrl(wxDomainUrlVO);
         }catch (Exception e){
             log.error("删除数据异常，请稍后再试 ｛｝",Throwables.getStackTraceAsString(e));
