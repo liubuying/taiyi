@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @Validated
 @Slf4j
-public abstract class CompanyUserRelationServiceImpl implements CompanyUserRelationService {
+public class CompanyUserRelationServiceImpl implements CompanyUserRelationService {
     @Resource
     private CompanyUserRelationMapper companyUserRelationMapper;
 
