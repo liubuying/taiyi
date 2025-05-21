@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.company;
 
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+
+import java.time.LocalDateTime;
 
 /**
  * 法人信息 DO
@@ -51,13 +50,4 @@ public class LegalPersonDO extends BaseDO {
      * 关联公司ID
      */
     private Long companyId;
-    /**
-     * 创建时间
-     */
-    private LocalDateTime gmtCreate;
-    /**
-     * 更新时间
-     */
-    private LocalDateTime gmtModified;
-
 }

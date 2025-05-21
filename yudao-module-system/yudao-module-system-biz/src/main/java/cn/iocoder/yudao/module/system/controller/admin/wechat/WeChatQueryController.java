@@ -7,10 +7,12 @@ import cn.iocoder.yudao.module.system.controller.admin.wecom.token.vo.JsApiInfoV
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.service.wechat.WeChatService;
-import cn.iocoder.yudao.module.system.util.qianxun.QianXunApi;
+import cn.iocoder.yudao.module.system.util.qianxun.QianXunUtils;
+import cn.iocoder.yudao.module.system.util.qianxun.QianXunUtilsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -47,7 +49,7 @@ public class WeChatQueryController {
      * 获取登录微信二维码
      */
     @PostMapping("/getQrCode")
-    @Operation(summary = "获取微信验证码")
+    @Operation(summary = "获取微信二维码")
     @ApiAccessLog(operateType = GET)
     public CommonResult<String> getQrCode(@RequestBody Object request) {
 
@@ -65,7 +67,7 @@ public class WeChatQueryController {
             // 获取域名
             Object o = objectList.get(0);
             String domain = o.toString();
-            Map<String, Object> loginQrCode = QianXunApi.getLoginQrCode(domain);
+            Map<String, T> loginQrCode = QianXunUtils.getLoginQrCode(domain);
             if (loginQrCode == null || !loginQrCode.containsKey("result")) {
                 return CommonResult.error(500, "获取二维码失败");
             }

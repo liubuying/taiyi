@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.company;
 
 import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
- * 入驻公司信息 DO
+ * 入驻公司信息与用户绑定 DO
  *
  * @author 芋道源码
  */
@@ -39,17 +37,4 @@ public class CompanyUserRelationDO extends BaseDO {
      * 员工名称
      */
     private String userName;
-    /**
-     * 操作人ID
-     */
-    private Long operatorId;
-    /**
-     * 创建时间
-     */
-    private LocalDateTime gmtCreate;
-    /**
-     * 更新时间
-     */
-    private LocalDateTime gmtModified;
-
 }

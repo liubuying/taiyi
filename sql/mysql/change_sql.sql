@@ -1,5 +1,3 @@
-
-
 CREATE TABLE taiyi_legal_person (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
     name VARCHAR(100) NOT NULL COMMENT '法人姓名',
@@ -202,8 +200,6 @@ CREATE TABLE `Enterprise_Information` (
 -- 插入企业信息：
 INSERT INTO `Enterprise_Information` (`corpid`, `name`, `square_logo_url`, `description`)
 VALUES ('ww7d23c84b96863bc3', '示例企业', 'https://example.com/logo.png', '示例企业描述');
-
-
 
 -- 微信账号基础表（包含客服和普通用户）
 CREATE TABLE wx_accounts (
