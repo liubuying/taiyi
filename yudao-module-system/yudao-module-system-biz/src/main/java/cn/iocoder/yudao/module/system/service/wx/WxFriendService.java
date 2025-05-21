@@ -9,4 +9,7 @@ public interface WxFriendService {
 
     CommonResult<PageResult<WxFriendVO>> queryFriendDataList(WxQueryDTO dto);
 
+    //定时任务、登录成功后调用刷新接口
+    void refreshWxFriendFromQianxun(String wxid);
+
 }
