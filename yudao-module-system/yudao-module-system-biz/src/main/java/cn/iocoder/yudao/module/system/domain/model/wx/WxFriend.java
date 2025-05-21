@@ -27,4 +27,5 @@ public class WxFriend {
     private String avatarMaxUrl;
     private String sex;
     private String label;
+    private String type;
 }

@@ -122,4 +122,11 @@ public interface RedisKeyConstants {
      */
     String JSAPI_TICKET_PREFIX =  "jsapi_ticket";
 
+    /**
+     * 微信用户、群聊列表
+     * KEY 格式：wx_group_person:{wxid}
+     * VALUE 数据格式 String, 模版信息
+     */
+    String WX_GROUP_PERSON =  "wx_group_person:%s";//":%s";
+
 }

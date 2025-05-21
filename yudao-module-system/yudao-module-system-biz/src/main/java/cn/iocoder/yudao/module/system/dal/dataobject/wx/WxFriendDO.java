@@ -35,4 +35,7 @@ public class WxFriendDO {
     private String avatarMaxUrl;
     private String sex;
     private String label;
+    private String type;
+    private Integer groupNumberCount;
+    private String groupMainWxId;
 }
