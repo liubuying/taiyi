@@ -7,12 +7,12 @@ import cn.iocoder.yudao.module.system.controller.admin.wecom.token.vo.JsApiInfoV
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.service.wechat.WeChatService;
-import cn.iocoder.yudao.module.system.util.qianxun.QianXunUtils;
-import cn.iocoder.yudao.module.system.util.qianxun.QianXunUtilsImpl;
+import cn.iocoder.yudao.module.system.wrapper.qianxun.QXunWrapper;
+import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunQrCode;
+import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +36,9 @@ public class WeChatQueryController {
 
     @Resource
     private WeChatService weChatService;
+
+    @Resource
+    private QXunWrapper qXunWrapper;
 
     private CommonResult<AdminUserDO> getUser(){
         Long loginUserId = getLoginUserId();
@@ -64,9 +67,8 @@ public class WeChatQueryController {
         // 获取域名
         Object o = objectList.get(0);
         String domain = o.toString();
-        Map<String, Object> loginQrCode = QianXunApi.getLoginQrCode(domain);
-        return CommonResult.success(loginQrCode.get("result").toString());
-
+        QianXunResponse<QianXunQrCode> loginQrCode = qXunWrapper.getLoginQrCode(domain);
+        return CommonResult.success(loginQrCode.getResult().getQrCode());
     }
 
     /**
