@@ -1,3 +1,15 @@
+ALTER TABLE taiyi_db.taiyi_domain_name CHANGE `desc` domain_desc text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '域名备注';
+
+ALTER TABLE taiyi_db.taiyi_domain_name ADD `domain` varchar(64) NOT NULL COMMENT '域名IP或者域名';
+ALTER TABLE taiyi_db.taiyi_domain_name ADD `desc` TEXT NULL COMMENT '域名备注';
+
+
+ALTER TABLE taiyi_db.taiyi_domain_name ADD deleted INT DEFAULT 0 NULL COMMENT '是否删除 0未删除 1已删除';
+ALTER TABLE taiyi_db.taiyi_domain_name ADD creatorId BIGINT NOT NULL COMMENT '创建人';
+
+
+
+
 ALTER TABLE taiyi_db.taiyi_wx_account_pool ADD creator_nick_name varchar(100) NOT NULL COMMENT '创建人昵称';
 
 ALTER TABLE taiyi_db.taiyi_wx_account_pool ADD operator_nick_name varchar(100) NULL COMMENT '修改人昵称';
