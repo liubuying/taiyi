@@ -36,6 +36,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象，包含二维码信息
      */
+    @Override
     public  QianXunResponse<QianXunQrCode> getLoginQrCode(String ip){
         QianXunApiTypeEnum apiType = QianXunApiTypeEnum.GET_LOGIN_QRCODE;
         return sendRequest(
@@ -48,10 +49,6 @@ public class QXunWrapperImpl implements QXunWrapper {
         );
     }
 
-    @Override
-    public QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip) {
-        return null;
-    }
 
     /**
      * 获取登录状态
@@ -59,6 +56,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象，包含登录状态
      */
+    @Override
     public  QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, Integer prot){
         QianXunApiTypeEnum apiType = QianXunApiTypeEnum.GET_LOGIN_STATUS;
         ip = ip + prot;
@@ -78,6 +76,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象，包含微信列表
      */
+    @Override
     public  QianXunResponse<List<QianXunLoginStatus>> getWeChatList(String ip){
         QianXunApiTypeEnum apiTypeEnum = QianXunApiTypeEnum.GET_WECHAT_LIST;
         return sendArrayRequest(

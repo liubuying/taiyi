@@ -21,8 +21,9 @@ public interface QXunWrapper {
      *
      * @param ip 服务器域名
      * @return 响应对象，包含登录状态
+     * todo zhenli 改bug
      */
-    QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip);
+    QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, Integer prot);
 
     /**
      * 获取微信列表
