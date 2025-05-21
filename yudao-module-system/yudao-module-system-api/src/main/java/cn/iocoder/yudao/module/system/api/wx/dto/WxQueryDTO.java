@@ -16,5 +16,7 @@ public class WxQueryDTO  extends PageParam {
 
 
     private String nick;
+    private String tenantId;
+    private String type;
 
 }

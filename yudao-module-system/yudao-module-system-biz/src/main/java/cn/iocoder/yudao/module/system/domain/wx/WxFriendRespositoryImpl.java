@@ -34,12 +34,12 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
 
         // 标准计算公式 mysql偏移量
         int offset = (dto.getPageNo() - 1) * dto.getPageSize();
-        List<WxFriendVO> wxList =wxFriendMapper.queryFriendDataList(dto,offset,dto.getPageSize());
+        List<WxFriendVO> wxList =wxFriendMapper.queryFriendDataList(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId(),offset,dto.getPageSize());
 
         if(wxList.size()>0){
             PageResult pageResult=new PageResult();
             pageResult.setList(wxList);
-            pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto));
+            pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId()));
             return CommonResult.success(pageResult);
         }
 
@@ -65,11 +65,13 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
         }
         PageResult pageResult=new PageResult();
         pageResult.setList(wxList);
-        pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto));
+        pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId()));
 
         return CommonResult.success(pageResult);
     }
 
+
+    //TO DO
     private List<WxFriendDO> getWxFriendList(String wxId, String getFriendList) {
         List<WxFriendDO> list=new ArrayList<>();
 
