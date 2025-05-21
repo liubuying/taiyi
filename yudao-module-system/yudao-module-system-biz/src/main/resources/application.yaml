@@ -37,6 +37,7 @@ spring:
 
 server:
   port: 48081
+  #port: 48084
 
 logging:
   file:

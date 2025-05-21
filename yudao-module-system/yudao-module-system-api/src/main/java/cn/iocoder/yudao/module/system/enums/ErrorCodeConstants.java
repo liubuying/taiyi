@@ -166,6 +166,8 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1-002-028-000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1_002_028_000, "模板参数({})缺失");
 
+    // ========== 参数验证 1-002-029-000 ==========
+    ErrorCode PARAM_NOT_NULL = new ErrorCode(1_002_029_000, "必要参数不能为空");
     // ========== 公司用户关系 1-002-132-000 ==========
     ErrorCode COMPANY_USER_RELATION_NOT_EXISTS = new ErrorCode(1_002_132_000, "公司用户关系不存在");
 

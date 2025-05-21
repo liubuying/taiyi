@@ -78,13 +78,13 @@ public interface AdminUserApi extends AutoTransable<AdminUserRespDTO> {
     CommonResult<Boolean> validateUserList(@RequestParam("ids") Collection<Long> ids);
 
     @Override
-    @GetMapping("select")
+    @GetMapping("/select")
     default List<AdminUserRespDTO> selectByIds(List<?> ids) {
         return getUserList(Convert.toList(Long.class, ids)).getCheckedData();
     }
 
     @Override
-    @GetMapping("select-list")
+    @GetMapping("/select-list")
     default AdminUserRespDTO selectById(Object id) {
         return getUser(Convert.toLong(id)).getCheckedData();
     }

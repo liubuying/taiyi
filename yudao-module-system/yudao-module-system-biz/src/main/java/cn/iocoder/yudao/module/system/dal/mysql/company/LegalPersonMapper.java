@@ -7,9 +7,9 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.system.controller.admin.company.vo.legalperson.LegalPersonPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.company.LegalPersonDO;
-//import cn.iocoder.yudao.module.taiyi.dal.dataobject.legalperson.LegalPersonDO;
+
 import org.apache.ibatis.annotations.Mapper;
-//import cn.iocoder.yudao.module.taiyi.controller.admin.legalperson.vo.*;
+
 
 /**
  * 法人信息 Mapper

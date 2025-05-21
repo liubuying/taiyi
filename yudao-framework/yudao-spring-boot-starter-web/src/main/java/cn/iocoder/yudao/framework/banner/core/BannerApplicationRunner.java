@@ -10,14 +10,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * 项目启动成功后，提供文档相关的地址
  *
- * @author 芋道源码
+ *
  */
 @Slf4j
 public class BannerApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        ThreadUtil.execute(() -> {
+        /*ThreadUtil.execute(() -> {
             ThreadUtil.sleep(1, TimeUnit.SECONDS); // 延迟 1 秒，保证输出到结尾
             log.info("\n----------------------------------------------------------\n\t" +
                             "项目启动成功！\n\t" +
@@ -45,7 +45,7 @@ public class BannerApplicationRunner implements ApplicationRunner {
             System.out.println("[支付系统 yudao-module-pay - 教程][参考 https://cloud.iocoder.cn/pay/build/ 开启]");
             // AI 大模型
             System.out.println("[AI 大模型 yudao-module-ai - 教程][参考 https://cloud.iocoder.cn/ai/build/ 开启]");
-        });
+        });*/
     }
 
 }

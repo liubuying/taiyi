@@ -100,6 +100,7 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
+        // 确保缓存请求体的过滤器最先执行
         return createFilterBean(new CacheRequestBodyFilter(), WebFilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
     }
 

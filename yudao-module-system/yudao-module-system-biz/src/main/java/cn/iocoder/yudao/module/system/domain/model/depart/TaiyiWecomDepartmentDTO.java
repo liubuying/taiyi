@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.domain.dto;
+package cn.iocoder.yudao.module.system.domain.model.depart;
 
 import java.io.Serializable;
 

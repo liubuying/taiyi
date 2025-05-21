@@ -5,7 +5,7 @@ package cn.iocoder.yudao.framework.common.enums;
  *
  *  考虑到每个 starter 都需要用到该工具类，所以放到 common 模块下的 enum 包下
  *
- * @author 芋道源码
+ *
  */
 public interface WebFilterOrderEnum {
 
@@ -15,7 +15,8 @@ public interface WebFilterOrderEnum {
 
     int ENV_TAG_FILTER = TRACE_FILTER + 1;
 
-    int REQUEST_BODY_CACHE_FILTER = Integer.MIN_VALUE + 500;
+    // 请求体缓存过滤器，必须在最前面执行
+    int REQUEST_BODY_CACHE_FILTER = Integer.MIN_VALUE - 1;
 
     // OrderedRequestContextFilter 默认为 -105，用于国际化上下文等等
 

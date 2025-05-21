@@ -14,8 +14,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.filter.ApiRequestFilter;
+import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyWrapper;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.infra.api.logger.ApiAccessLogApi;
 import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
@@ -31,6 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
@@ -44,7 +47,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  *
  * 目的：记录 API 访问日志到数据库中
  *
- * @author 芋道源码
+ *
  */
 @Slf4j
 public class ApiAccessLogFilter extends ApiRequestFilter {
@@ -69,8 +72,7 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         LocalDateTime beginTime = LocalDateTime.now();
         // 提前获得参数，避免 XssFilter 过滤处理
         Map<String, String> queryString = ServletUtils.getParamMap(request);
-        String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getBody(request) : null;
-
+        String requestBody = getBody(request);
         try {
             // 继续过滤器
             filterChain.doFilter(request, response);
@@ -81,6 +83,19 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
             createApiAccessLog(request, beginTime, queryString, requestBody, ex);
             throw ex;
         }
+    }
+
+    private String getBody(HttpServletRequest request){
+        if (ServletUtils.isJsonRequest(request)) {
+            // 如果请求已被包装为 CacheRequestBodyWrapper，直接读取缓存
+            if (request instanceof CacheRequestBodyWrapper) {
+                CacheRequestBodyWrapper wrapper = (CacheRequestBodyWrapper) request;
+                return new String(wrapper.getCachedBody(), StandardCharsets.UTF_8);
+            }
+            // 否则尝试直接读取（应仅在 Filter 未生效时发生）
+            return ServletUtils.getBody(request);
+        }
+        return null;
     }
 
     private void createApiAccessLog(HttpServletRequest request, LocalDateTime beginTime,
