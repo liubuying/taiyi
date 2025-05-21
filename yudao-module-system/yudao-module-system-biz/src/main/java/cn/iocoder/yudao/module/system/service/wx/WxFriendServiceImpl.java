@@ -35,20 +35,18 @@ public class WxFriendServiceImpl  implements WxFriendService {
 
        // 标准计算公式 mysql偏移量
         int offset = (dto.getPageNo() - 1) * dto.getPageSize();
-        List<WxFriendVO>  wxList =wxFriendMapper.queryFriendDataList(dto,offset,dto.getPageSize());
+        List<WxFriendVO>  wxList =wxFriendMapper.queryFriendDataList(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId(),offset,dto.getPageSize());
 
        if(wxList.size()>0){
            PageResult pageResult=new PageResult();
            pageResult.setList(wxList);
-           pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto));
+           pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId()));
            return CommonResult.success(pageResult);
        }
 
         if(wxList.isEmpty()){
-
             //开始拉去微信好友列表
             List<WxFriend> lists=getWxFriendList(dto.getWxId(),"getFriendList");
-
             //拉取好友列表数据为空 没有添加好友
             if(lists.size()>=0){
                 PageResult pageResult=new PageResult();
@@ -65,7 +63,7 @@ public class WxFriendServiceImpl  implements WxFriendService {
         }
         PageResult pageResult=new PageResult();
         pageResult.setList(wxList);
-        pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto));
+        pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId()));
 
         return CommonResult.success(pageResult);
     }

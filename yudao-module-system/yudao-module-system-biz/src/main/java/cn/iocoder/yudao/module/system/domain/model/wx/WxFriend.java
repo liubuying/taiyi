@@ -14,6 +14,7 @@ public class WxFriend {
     private String nickWhole;
     private String remarkBrief;
     private String remarkWhole;
+    private String w;
     private String enBrief;
     private String enWhole;
     private String v3;

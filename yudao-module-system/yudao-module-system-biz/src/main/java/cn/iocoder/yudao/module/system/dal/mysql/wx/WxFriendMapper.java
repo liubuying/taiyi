@@ -18,22 +18,49 @@ import java.util.List;
 public interface WxFriendMapper extends BaseMapper<WxFriend> {
 
 
+    @Select("<script>" +
+            "SELECT * FROM wx_friend_info " +
+            "<where>" +
+            "  <if test='nick != null and nick.trim() != \"\"'>" +
+            "    <bind name=\"nick\" value=\"'%' + nick + '%'\" />" +
+            "    AND (nick LIKE #{nick} " +
+            "    OR wx_num LIKE #{nick} " +
+            "    OR province LIKE #{nick})" +
+            "  </if>" +
+            "  <if test='wxId!= null and wxId.trim() != \"\"'>" +
 
-@Select("<script>" +
-        "SELECT * FROM wx_friend_info " +
-        "<where>" +
-        "  <if test='param.nick != null'>AND friend_nick LIKE CONCAT('%', #{param.nick}, '%')</if>" +
-        "  <if test='param.wxId != null'>AND wx_persion_id = #{param.wxId}</if>" +
-        "  <if test='param.type != null'>AND type = #{param.type}</if>" +
-        "</where>" +
-        "ORDER BY id DESC " +
-        "LIMIT #{offset}, #{pageSize}" +
-        "</script>")
-    List<WxFriendVO> queryFriendDataList(@Param("param")WxQueryDTO  param, @Param("offset") int offset, @Param("pageSize") int pageSize);
+            "    AND wx_persion_id = #{wxId}" +
+            "  </if>" +
+            "  <if test='type != null and type.trim() != \"\"'>" +
+            "    AND type = #{type}" +
+            "  </if>" +
+            "AND tenant_id = #{tenantId}" +
+            "</where>" +
+            "ORDER BY update_time DESC " +
+            "LIMIT #{offset}, #{pageSize}" +
+            "</script>")
+    List<WxFriendVO> queryFriendDataList(@Param("nick")String  nick,@Param("wxId")String  wxId, @Param("type")String  type,@Param("tenantId") String tenantId, @Param("offset") int offset, @Param("pageSize") int pageSize);
 
 
+    @Select("<script>" +
+            "SELECT count(*) FROM wx_friend_info " +
+            "<where>" +
+            "  <if test='nick != null and nick.trim() != \"\"'>" +
+            "    <bind name=\"nick\" value=\"'%' + nick + '%'\" />" +
+            "    AND (nick LIKE #{nick} " +
+            "    OR wx_num LIKE #{nick} " +
+            "    OR province LIKE #{nick})" +
+            "  </if>" +
+            "  <if test='wxId!= null and wxId.trim() != \"\"'>" +
 
-    @Select("SELECT Count(1) FROM wx_friend_info")
-
-    Long queryFriendDataListCount(WxQueryDTO dto);
+            "    AND wx_persion_id = #{wxId}" +
+            "  </if>" +
+            "  <if test='type != null and type.trim() != \"\"'>" +
+            "    AND type = #{type}" +
+            "  </if>" +
+            "AND tenant_id = #{tenantId}" +
+            "</where>" +
+            "ORDER BY update_time DESC " +
+            "</script>")
+   Long queryFriendDataListCount(@Param("nick")String  nick,@Param("wxId")String  wxId, @Param("type")String  type,@Param("tenantId") String tenantId);
 }
