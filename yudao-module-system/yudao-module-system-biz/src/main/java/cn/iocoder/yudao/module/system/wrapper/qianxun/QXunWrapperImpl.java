@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +37,15 @@ public class QXunWrapperImpl implements QXunWrapper {
      */
     @Override
     public  QianXunResponse<QianXunQrCode> getLoginQrCode(String ip){
-        QianXunApiTypeEnum apiType = QianXunApiTypeEnum.GET_LOGIN_QRCODE;
         return sendRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
                 null,
-                apiType,
+                QianXunApiTypeEnum.GET_LOGIN_QRCODE,
                 data -> new HashMap<>(), // 空data
                 QianXunQrCode.class
         );
     }
-
 
     /**
      * 获取登录状态
@@ -57,14 +54,13 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @return 响应对象，包含登录状态
      */
     @Override
-    public  QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, Integer prot){
-        QianXunApiTypeEnum apiType = QianXunApiTypeEnum.GET_LOGIN_STATUS;
+    public  QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, String prot){
         ip = ip + prot;
         return sendRequest(
                 ip,
                 WECHAT_REQUEST_URL_PATH,
                 null,
-                apiType,
+                QianXunApiTypeEnum.GET_LOGIN_STATUS,
                 data -> new HashMap<>(), // 空data
                 QianXunLoginStatus.class
         );
@@ -78,20 +74,14 @@ public class QXunWrapperImpl implements QXunWrapper {
      */
     @Override
     public  QianXunResponse<List<QianXunLoginStatus>> getWeChatList(String ip){
-        QianXunApiTypeEnum apiTypeEnum = QianXunApiTypeEnum.GET_WECHAT_LIST;
         return sendArrayRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
                 null,
-                apiTypeEnum,
+                QianXunApiTypeEnum.GET_WECHAT_LIST,
                 data -> new HashMap<>(),
                 QianXunLoginStatus.class
         );
-    }
-
-    @Override
-    public QianXunResponse<Object> killWeChat(String ip) {
-        return null;
     }
 
     /**
@@ -100,14 +90,14 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象
      */
-    public  QianXunResponse<Object> killWeChat(String ip, Integer prot){
-        QianXunApiTypeEnum  apiType = QianXunApiTypeEnum.KILL_WECHAT;
+    @Override
+    public QianXunResponse<Object> killWeChat(String ip, String prot){
         ip = ip + prot;
         return sendRequest(
                 ip,
                 WECHAT_REQUEST_URL_PATH,
                 null,
-                apiType,
+                QianXunApiTypeEnum.KILL_WECHAT,
                 data -> new HashMap<>(), // 空data
                 Object.class
         );
@@ -120,8 +110,9 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param version 版本号
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> editVersion (String ip, String version){
-        QianXunApiTypeEnum apiType = QianXunApiTypeEnum.EDIT_VERSION;
+        // QianXunApiTypeEnum.EDIT_VERSION;
         return null;
     }
 
@@ -132,8 +123,9 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param time 时间(单位：秒)
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> setDownloadImage(String ip, Integer time){
-        QianXunApiTypeEnum apiType = QianXunApiTypeEnum.SET_DOWNLOAD_IMAGE;
+        // QianXunApiTypeEnum.SET_DOWNLOAD_IMAGE;
         return null;
     }
     // ==================== 获取信息相关API =========================
@@ -145,13 +137,13 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param wxid 微信ID
      * @return 个人信息
      */
+    @Override
     public QianXunResponse<QianXunInfo> getSelfInfo(String ip, String wxid) {
-        QianXunApiTypeEnum apiType = QianXunApiTypeEnum.GET_SELF_INFO;
         return sendRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
                 wxid,
-                apiType,
+                QianXunApiTypeEnum.GET_SELF_INFO,
                 data -> {
                     data.put("type", "2");
                     return data;
@@ -167,8 +159,8 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param wxId 微信ID
      * @return 好友列表
      */
+    @Override
     public QianXunResponse<List<QianXunInfoFriend>> getFriendList(String ip, String wxId) {
-
         return sendArrayRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
@@ -189,13 +181,13 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param wxId 微信ID
      * @return 响应对象，包含群聊列表
      */
+    @Override
     public  QianXunResponse<List<QianXunInfoGroup>> getGroupList(String ip, String wxId) {
-        QianXunApiTypeEnum apiType = QianXunApiTypeEnum.GET_GROUP_LIST;
         return sendArrayRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
                 wxId,
-                apiType,
+                QianXunApiTypeEnum.GET_GROUP_LIST,
                 data -> {
                     data.put("type", "2");
                     return data;
@@ -212,6 +204,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param wxId 微信ID
      * @return 响应对象，包含公众号列表
      */
+    @Override
     public  QianXunResponse<List<QianXunInfo>> getPublicList(String ip, String wxId){
         return null;
     }
@@ -224,6 +217,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param wxId 微信ID
      * @return 响应对象，包含标签列表
      */
+    @Override
     public  QianXunResponse<List<Object>> getLabelList(String ip, String wxId){
         return null;
     }
@@ -236,13 +230,13 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param groupWxId 群wxId
      * @return 响应对象，包含群成员列表及其群昵称
      */
+    @Override
     public  QianXunResponse<List<QianXunInfoGroupMember>> getMemberList(String ip, String wxId, String groupWxId){
-        QianXunApiTypeEnum ApiType = QianXunApiTypeEnum.GET_MEMBER_LIST;
         return sendArrayRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
                 wxId,
-                ApiType,
+                QianXunApiTypeEnum.GET_MEMBER_LIST,
                 data -> {
                     data.put("wxid",groupWxId);
                     data.put("type","2");
@@ -262,13 +256,13 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param toWxId 目标wxId
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunInfoGroupMember> getMemberNick(String ip, String wxId, String groupWxId, String toWxId){
-        QianXunApiTypeEnum ApiType = QianXunApiTypeEnum.GET_MEMBER_NICK;
         return sendRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
                 wxId,
-                ApiType,
+                QianXunApiTypeEnum.GET_MEMBER_NICK,
                 data -> {
                     data.put("wxid",groupWxId);
                     data.put("objWxid",toWxId);
@@ -288,6 +282,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param toWxId 目标wxId
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunInfo> queryObj(String ip, String wxId, String toWxId){
         return null;
     }
@@ -297,11 +292,22 @@ public class QXunWrapperImpl implements QXunWrapper {
      *
      * @param ip 服务器域名
      * @param wxId 微信ID
-     * @param towxId 目标wxId
+     * @param toId 目标 QQ 或者 手机号 或者 微信号
      * @return 响应对象
      */
-    public  QianXunResponse<QianXunInfo> queryNewFriend(String ip, String wxId, String towxId){
-        return null;
+    @Override
+    public  QianXunResponse<QianXunInfoNewFriend> queryNewFriend(String ip, String wxId, String toId){
+        return sendRequest(
+                ip,
+                QIANXUN_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.QUERY_NEW_FRIEND,
+                data -> {
+                    data.put("obj",toId);
+                    return data;
+                },
+                QianXunInfoNewFriend.class
+        );
     }
 
     /**
@@ -312,8 +318,20 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param groupwxId 群wxId
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunInfoGroup> queryGroup(String ip, String wxId, String groupwxId){
-        return null;
+        return sendRequest(
+                ip,
+                QIANXUN_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.QUERY_GROUP,
+                data -> {
+                    data.put("wxid",groupwxId);
+                    data.put("type","2");
+                    return data;
+                },
+                QianXunInfoGroup.class
+        );
     }
 
     // ==================== 好友管理相关API =========================
@@ -327,6 +345,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param v4 v4数据
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> agreeFriendReq(String ip, String wxId, String v3, String v4){
         return null;
     }
@@ -340,6 +359,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param message 验证消息
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> addFriendByV3(String ip, String wxId, String v3, String message){
         return null;
     }
@@ -354,6 +374,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param message 验证消息
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> addFriendByGroupWxid(String ip, String wxId, String groupWxId, String toWxId, String message){
         return null;
     }
@@ -366,6 +387,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param toWxId 目标wxId
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> delFriend(String ip, String wxId, String toWxId){
         return null;
     }
@@ -379,6 +401,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param remark 备注
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> editObjRemark(String ip, String wxId, String toWxId, String remark){
         return null;
     }
@@ -393,6 +416,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param groupWxId 群wxId
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> quitGroup(String ip, String wxId, String groupWxId){
         return null;
     }
@@ -405,6 +429,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param wxIds 目标wxId列表，用英文逗号分隔
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> createGroup(String ip, String wxId, String wxIds){
         return null;
     }
@@ -418,6 +443,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param toWxIds 目标wxId列表，用英文逗号分隔
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> addMembers(String ip, String wxId, String groupWxId, String toWxIds){
         return null;
     }
@@ -431,6 +457,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param toWxIds 目标wxId列表，用英文逗号分隔
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> inviteMembers(String ip, String wxId, String groupWxId, String toWxIds){
         return null;
     }
@@ -444,6 +471,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param toWxIds 目标wxId列表，用英文逗号分隔
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> delMembers(String ip, String wxId, String groupWxId, String toWxIds){
         return null;
     }
@@ -457,6 +485,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param nick 昵称
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> editSelfMemberNick(String ip, String wxId, String groupWxId, String nick){
         return null;
     }
@@ -471,6 +500,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param content 消息内容
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendText(String ip, String wxId, String toWxId, String content){
         return null;
     }
@@ -484,6 +514,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param content 消息内容
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendText2(String ip, String wxId, String toWxId, String content){
         return null;
     }
@@ -498,6 +529,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param msgId 引用消息ID
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendReferText(String ip, String wxId, String toWxId, String content, String msgId){
         return null;
     }
@@ -511,6 +543,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param path 图片路径
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendImage(String ip, String wxId, String toWxId, String path){
         return null;
     }
@@ -524,6 +557,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param path 文件路径
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendFile(String ip, String wxId, String toWxId, String path){
         return null;
     }
@@ -537,6 +571,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param path gif路径
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendGif(String ip, String wxId, String toWxId, String path){
         return null;
     }
@@ -553,6 +588,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param imgUrl 图片地址
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendShareUrl(String ip, String wxId, String toWxId, String title, String desc, String url, String imgUrl){
         return null;
     }
@@ -566,6 +602,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param applet 小程序xml
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendApplet(String ip, String wxId, String toWxId, String applet){
         return null;
     }
@@ -579,6 +616,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param musicXml 音乐分享xml
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendMusic(String ip, String wxId, String toWxId, String musicXml){
         return null;
     }
@@ -593,6 +631,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param dataList 聊天记录数据
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendChatLog(String ip, String wxId, String toWxId, String title, String dataList){
         return null;
     }
@@ -607,6 +646,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param nickName 昵称
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendCard(String ip, String wxId, String toWxId, String content, String nickName){
         return null;
     }
@@ -620,6 +660,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param xml XML内容
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<QianXunMessage> sendXml(String ip, String wxId, String toWxId, String xml){
         return null;
     }
@@ -633,6 +674,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param datPath dat图片路径
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<String> decryptImage(String ip, String datPath){
         return null;
     }
@@ -643,6 +685,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> checkWeChat(String ip){
         return null;
     }
@@ -653,6 +696,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> getAuthInfo(String ip){
         return null;
     }
@@ -665,6 +709,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param transferId 转账ID
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> confirmTrans(String ip, String wxId, String transferId){
         return null;
     }
@@ -677,6 +722,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param transferId 转账ID
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> returnTrans(String ip, String wxId, String transferId){
         return null;
     }
@@ -689,6 +735,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param url 链接地址
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> openBrowser(String ip, String wxId, String url){
         return null;
     }
@@ -702,6 +749,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @param json JSON参数
      * @return 响应对象
      */
+    @Override
     public  QianXunResponse<Object> runCloudFunction(String ip, String wxId, String hookName, String json){
         return null;
     }

@@ -31,12 +31,12 @@ public class QianXunLoginStatus {
     /**
      * 端口号
      */
-    private Integer port;
+    private String port;
 
     /**
      * 进程ID
      */
-    private Integer pid;
+    private String pid;
 
     /**
      * 标志
@@ -44,12 +44,13 @@ public class QianXunLoginStatus {
     private String flag;
 
     /**
-     * 开始运行时间戳
+     * 开始运行10位时间戳
      */
     private String startTimeStamp;
 
     /**
      * 开始运行时间
+     * 2024年5月23日20时38分12秒
      */
     private String startTime;
 

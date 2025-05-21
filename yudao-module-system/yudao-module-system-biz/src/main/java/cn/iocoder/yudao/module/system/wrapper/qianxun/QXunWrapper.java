@@ -20,10 +20,10 @@ public interface QXunWrapper {
      * 获取登录状态
      *
      * @param ip 服务器域名
+     * @param prot 服务器端口号
      * @return 响应对象，包含登录状态
-     * todo zhenli 改bug
      */
-    QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, Integer prot);
+    QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, String prot);
 
     /**
      * 获取微信列表
@@ -39,10 +39,8 @@ public interface QXunWrapper {
      * @param ip 服务器域名
      * @return 响应对象
      */
-     QianXunResponse<Object> killWeChat(String ip);
+    QianXunResponse<Object> killWeChat(String ip, String prot);
 
-
-    // 暂时不使用
     /**
      * 修改微信版本号
      *
@@ -143,10 +141,10 @@ public interface QXunWrapper {
      *
      * @param ip 服务器域名
      * @param wxId 微信ID
-     * @param towxId 目标wxId
+     * @param toId 目标wxId
      * @return 响应对象
      */
-     QianXunResponse<QianXunInfo> queryNewFriend(String ip, String wxId, String towxId);
+    QianXunResponse<QianXunInfoNewFriend> queryNewFriend(String ip, String wxId, String toId);
 
     /**
      * 查询群聊信息

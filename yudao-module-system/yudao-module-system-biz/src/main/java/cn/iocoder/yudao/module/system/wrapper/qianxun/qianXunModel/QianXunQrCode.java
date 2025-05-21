@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class QianXunQrCode {
     private String qrCode;
-    private Integer port;
-    private Integer pid;
+    private String port;
+    private String pid;
     private String flag;
 }
