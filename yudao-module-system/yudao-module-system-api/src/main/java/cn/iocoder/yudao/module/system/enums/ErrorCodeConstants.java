@@ -168,4 +168,17 @@ public interface ErrorCodeConstants {
 
     // ========== 参数验证 1-002-029-000 ==========
     ErrorCode PARAM_NOT_NULL = new ErrorCode(1_002_029_000, "必要参数不能为空");
+    // ========== 公司用户关系 1-002-132-000 ==========
+    ErrorCode COMPANY_USER_RELATION_NOT_EXISTS = new ErrorCode(1_002_132_000, "公司用户关系不存在");
+
+    // ========== 公司 1-002-133-000 ==========
+    ErrorCode COMPANY_NOT_EXISTS = new ErrorCode(1_002_133_000, "公司不存在");
+    ErrorCode COMPANY_UNIFIED_SOCIAL_CREDIT_CODE_EXISTS = new ErrorCode(1_002_133_001, "统一社会信用代码已存在");
+    ErrorCode COMPANY_DISABLE = new ErrorCode(1_002_133_002, "名字为【{}】的公司已被禁用");
+    ErrorCode COMPANY_NAME_EXISTS = new ErrorCode(1_002_133_003, "公司名称已存在");
+    ErrorCode COMPANY_HAS_USER = new ErrorCode(1_002_133_004, "公司下还有关联用户，无法删除");
+    ErrorCode LEGAL_PERSON_NOT_EXISTS = new ErrorCode(1_002_133_000, "法人信息不存在");
+    ErrorCode LEGAL_PERSON_CERT_NO_EXISTS = new ErrorCode(1_002_133_001, "证件号码已存在");
+
+    // ========== 千寻 1-002-068-000 ==========
 }
