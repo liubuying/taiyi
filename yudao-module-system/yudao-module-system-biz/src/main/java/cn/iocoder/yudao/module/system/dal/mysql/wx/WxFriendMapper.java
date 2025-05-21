@@ -1,13 +1,8 @@
 package cn.iocoder.yudao.module.system.dal.mysql.wx;
 
-import cn.hutool.db.Page;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryDTO;
 import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
-import cn.iocoder.yudao.module.system.dal.dataobject.wecom.depart.TaiyiWecomDepartmentDO;
-import cn.iocoder.yudao.module.system.domain.model.wx.WxFriend;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.iocoder.yudao.module.system.dal.dataobject.wx.WxFriendDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 @Mapper
-public interface WxFriendMapper extends BaseMapper<WxFriend> {
+public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
 
 
 
