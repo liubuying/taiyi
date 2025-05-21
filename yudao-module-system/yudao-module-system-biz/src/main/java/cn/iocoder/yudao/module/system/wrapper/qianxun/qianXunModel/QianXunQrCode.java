@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.util.qianxun.qianXunModel;
+package cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel;
 
 
 import lombok.Data;
