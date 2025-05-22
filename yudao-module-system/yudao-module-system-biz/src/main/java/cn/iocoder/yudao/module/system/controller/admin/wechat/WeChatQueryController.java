@@ -5,8 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.wecom.token.request.JsApiInfoRequest;
 import cn.iocoder.yudao.module.system.controller.admin.wecom.token.vo.JsApiInfoVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.service.wechat.WeChatService;
+import cn.iocoder.yudao.module.system.service.wxpool.WxAccountPoolService;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.QXunWrapper;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunQrCode;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunResponse;
@@ -40,6 +42,9 @@ public class WeChatQueryController {
     @Resource
     private QXunWrapper qXunWrapper;
 
+    @Resource
+    private WxAccountPoolService wxAccountPoolService;
+
     private CommonResult<AdminUserDO> getUser(){
         Long loginUserId = getLoginUserId();
         AdminUserDO user = userService.getUser(loginUserId);
@@ -55,18 +60,18 @@ public class WeChatQueryController {
     @PostMapping("/getQrCode")
     @Operation(summary = "获取微信二维码")
     @ApiAccessLog(operateType = GET)
-    public CommonResult<String> getQrCode(@RequestBody Object request) {
+    public CommonResult<String> getQrCode() {
         CommonResult<AdminUserDO> userResult = getUser();
         if(userResult.isSuccess()){
             return CommonResult.error(userResult);
         }
-        AdminUserDO userDO = userResult.getCheckedData();
+        WxAccountPoolRequest poolRequest = new WxAccountPoolRequest();
+
         // 查询 登录人下管理的微信列表
-        List<Object> objectList = weChatService.queryManageWechatList(getLoginUserId());
+        //List<Object> objectList = wxAccountPoolService.queryWxAccountPoolForPage();
 
         // 获取域名
-        Object o = objectList.get(0);
-        String domain = o.toString();
+        String domain = "192.168.50.23";
         QianXunResponse<QianXunQrCode> loginQrCode = qXunWrapper.getLoginQrCode(domain);
         return CommonResult.success(loginQrCode.getResult().getQrCode());
     }
@@ -74,8 +79,9 @@ public class WeChatQueryController {
     /**
      * 获取微信列表
      */
-    @PostMapping( "/queryWeChatList")
-    public CommonResult<JsApiInfoVO> queryWeChatList(@RequestBody JsApiInfoRequest request) {
+    @PostMapping( "/checkWeChatStatus")
+    public CommonResult<JsApiInfoVO> checkWeChatStatus(@RequestBody JsApiInfoRequest request) {
+
         return null;
     }
 
