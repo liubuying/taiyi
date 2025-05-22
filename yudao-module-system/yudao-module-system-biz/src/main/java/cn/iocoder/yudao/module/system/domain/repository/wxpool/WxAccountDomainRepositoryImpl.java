@@ -10,8 +10,10 @@ import cn.iocoder.yudao.module.system.dal.dataobject.domainurl.DomainWxAccountRe
 import cn.iocoder.yudao.module.system.dal.mysql.company.account.DomainWxAccountRelationMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.company.account.UsersWxAccountRelationMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.company.account.WxAccountPoolMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.domainurl.DomainNameMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
 import cn.iocoder.yudao.module.system.domain.convert.UserInfoConvert;
+import cn.iocoder.yudao.module.system.domain.convert.WxDomainUrlConvert;
 import cn.iocoder.yudao.module.system.domain.enums.AccountTypeEnum;
 import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
 import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
@@ -25,10 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
+public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository {
 
 
     @Resource
@@ -54,10 +53,13 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
     @Resource
     private EmployeeDomainRepository employeeDomainRepository;
 
+    @Resource
+    private DomainNameMapper domainNameMapper;
+
 
     @Override
     public PageResult<WxAccountPool> queryWxAccountPoolForPage(WxAccountPoolRequest wxAccountPoolRequest) {
-        if(wxAccountPoolRequest == null){
+        if (wxAccountPoolRequest == null) {
             log.info("查询账号池分页数据 参数为空");
             return PageResult.empty();
         }
@@ -84,6 +86,22 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
                     wxAccountPool.setCreator(userInfoMap.get(wxAccountPoolDO.getCreatorId()));
                     wxAccountPool.setOperator(userInfoMap.get(wxAccountPoolDO.getOperatorId()));
                     wxAccountPool.setIsExpired(YesOrNoEnum.getNameByStatus(wxAccountPoolDO.getIsExpired()));
+                    if (YesOrNoEnum.YES.equals(wxAccountPoolDO.getStatus())) {
+                        // 查询分配数据接口数据
+                        UsersWxAccountRelationDO usersWxAccountRelationDO = usersWxAccountRelationMapper.selectOne(UsersWxAccountRelationDO::getUnionId, wxAccountPoolDO.getUnionId(), UsersWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
+                        if (usersWxAccountRelationDO != null) {
+                            UserInfo userInfo = new UserInfo();
+                            userInfo.setUserId(usersWxAccountRelationDO.getEmployeeId());
+                            userInfo.setUserName(adminUserMapper.selectById(userInfo.getUserId()).getUsername());
+                            wxAccountPool.setEmployeeUser(userInfo);
+                        }
+
+                        DomainWxAccountRelationDO relationDO = domainWxAccountRelationMapper.selectOne(DomainWxAccountRelationDO::getUnionId, usersWxAccountRelationDO.getUnionId(), DomainWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
+                        if (relationDO != null) {
+                            DomainNameDO domainNameDO = domainNameMapper.selectOne(DomainNameDO::getId, relationDO.getDomainId(), DomainNameDO::getStatus, YesOrNoEnum.NO.getStatus());
+                            wxAccountPool.setDomainName(WxDomainUrlConvert.INSTANCE.convert(domainNameDO));
+                        }
+                    }
                     return wxAccountPool;
                 })
                 .collect(Collectors.toList());
@@ -133,7 +151,7 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
     @Override
     public Boolean bindDomainUrl(WxAccountPool wxAccountPool) {
         if (StringUtils.isBlank(wxAccountPool.getUnionId()) ||
-                 wxAccountPool.getOperator() == null ||
+                wxAccountPool.getOperator() == null ||
                 wxAccountPool.getDomainName() == null) {
             log.info("绑定域名 wxId / domainName 参数为空");
             return false;
@@ -141,7 +159,7 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
         // 账号和域名绑定
         List<DomainWxAccountRelationDO> domainWxAccountRelationDOS = domainWxAccountRelationMapper.selectList(DomainWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
                 DomainWxAccountRelationDO::getDeleted, YesOrNoEnum.NO.getStatus());
-        if(CollectionUtils.isNotEmpty(domainWxAccountRelationDOS)){
+        if (CollectionUtils.isNotEmpty(domainWxAccountRelationDOS)) {
             return true;
         }
 
@@ -168,7 +186,7 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
         DomainWxAccountRelationDO relationDO = domainWxAccountRelationMapper.selectOne(DomainWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
                 DomainWxAccountRelationDO::getDomainId, wxAccountPool.getDomainName().getId(),
                 DomainWxAccountRelationDO::getDeleted, YesOrNoEnum.NO.getStatus());
-        if(relationDO == null){
+        if (relationDO == null) {
             log.error("未查到绑定数据");
             throw new ServerException(ErrorCodeConstants.DATA_NOT_EXISTS);
         }
@@ -191,8 +209,8 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
         // 账号和域名绑定
         List<UsersWxAccountRelationDO> usersWxAccountRelationDOS = usersWxAccountRelationMapper.selectList(UsersWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
                 UsersWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
-        if(CollectionUtils.isNotEmpty(usersWxAccountRelationDOS)){
-            log.info("wxId已绑定,wxId:{}",wxAccountPool.getUnionId());
+        if (CollectionUtils.isNotEmpty(usersWxAccountRelationDOS)) {
+            log.info("wxId已绑定,wxId:{}", wxAccountPool.getUnionId());
             return true;
         }
         UsersWxAccountRelationDO usersWxAccountRelationDO = new UsersWxAccountRelationDO();
@@ -215,11 +233,29 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
         UsersWxAccountRelationDO usersWxAccountRelation = usersWxAccountRelationMapper.selectOne(UsersWxAccountRelationDO::getUnionId, wxAccountPool.getUnionId(),
                 UsersWxAccountRelationDO::getEmployeeId, wxAccountPool.getEmployeeUser().getUserId(),
                 UsersWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
-        if(usersWxAccountRelation == null){
-            log.info("wxId未绑定,wxId:{}",wxAccountPool.getUnionId());
+        if (usersWxAccountRelation == null) {
+            log.info("wxId未绑定,wxId:{}", wxAccountPool.getUnionId());
             throw new ServerException(ErrorCodeConstants.DATA_NOT_EXISTS);
         }
         usersWxAccountRelation.setStatus(YesOrNoEnum.YES.getStatus());
         return usersWxAccountRelationMapper.updateById(usersWxAccountRelation) > 1;
+    }
+
+    @Override
+    public List<WxAccountPool> queryWxAccountByEmployeeId(WxAccountPoolRequest poolRequest) {
+        // 查询员工绑定账号数据
+        List<UsersWxAccountRelationDO> usersWxAccountRelationDOS = usersWxAccountRelationMapper.selectList(UsersWxAccountRelationDO::getEmployeeId, poolRequest.getEmployeeId(),
+                UsersWxAccountRelationDO::getStatus, YesOrNoEnum.NO.getStatus());
+        if (CollectionUtils.isEmpty(usersWxAccountRelationDOS)) {
+            return Collections.emptyList();
+        }
+        List<String> wxUnionIdList = usersWxAccountRelationDOS.stream().map(UsersWxAccountRelationDO::getUnionId).collect(Collectors.toList());
+        poolRequest.setPageSize(500);
+        poolRequest.setWxUnionIdList(wxUnionIdList);
+        PageResult<WxAccountPool> wxAccountPoolPageResult = this.queryWxAccountPoolForPage(poolRequest);
+        if (wxAccountPoolPageResult == null || CollectionUtils.isEmpty(wxAccountPoolPageResult.getList())) {
+            return Collections.emptyList();
+        }
+        return wxAccountPoolPageResult.getList();
     }
 }

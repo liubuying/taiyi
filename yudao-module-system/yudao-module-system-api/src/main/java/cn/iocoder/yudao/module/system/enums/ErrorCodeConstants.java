@@ -183,4 +183,6 @@ public interface ErrorCodeConstants {
     // ========== 千寻 1-002-068-000 ==========
     ErrorCode DATA_NOT_EXISTS = new ErrorCode(1_003_001_001, "数据不存在");
 
+    ErrorCode WECHAT_LOGIN_RECORD_NOT_EXISTS = new ErrorCode(1_003_001_002, "微信用户登录记录不存在");
+
 }

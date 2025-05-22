@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.system.controller.admin.wechat;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.system.controller.admin.wechat.vo.WechatQuery;
 import cn.iocoder.yudao.module.system.controller.admin.wecom.token.request.JsApiInfoRequest;
 import cn.iocoder.yudao.module.system.controller.admin.wecom.token.vo.JsApiInfoVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import cn.iocoder.yudao.module.system.service.wechat.WeChatService;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.GET;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 
@@ -61,14 +64,16 @@ public class WeChatQueryController {
     @Operation(summary = "获取微信二维码")
     @ApiAccessLog(operateType = GET)
     public CommonResult<String> getQrCode() {
-        CommonResult<AdminUserDO> userResult = getUser();
-        if(userResult.isSuccess()){
-            return CommonResult.error(userResult);
+        Long loginUserId = getLoginUserId();
+        if(loginUserId == null ){
+            return CommonResult.error(UNAUTHORIZED);
         }
         WxAccountPoolRequest poolRequest = new WxAccountPoolRequest();
-
+        poolRequest.setEmployeeId(loginUserId.toString());
+        // 查询当前登陆人 分配的账号信息 和域名IP
+        List<WxAccountPool> wxAccountPools = wxAccountPoolService.queryWxAccountByEmployeeId(poolRequest);
         // 查询 登录人下管理的微信列表
-        //List<Object> objectList = wxAccountPoolService.queryWxAccountPoolForPage();
+
 
         // 获取域名
         String domain = "192.168.50.23";
@@ -77,11 +82,13 @@ public class WeChatQueryController {
     }
 
     /**
-     * 获取微信列表
+     *
      */
     @PostMapping( "/checkWeChatStatus")
-    public CommonResult<JsApiInfoVO> checkWeChatStatus(@RequestBody JsApiInfoRequest request) {
-
+    public CommonResult<JsApiInfoVO> checkWeChatStatus(@RequestBody WechatQuery request) {
+        // 查询记录登录的 微信端口记录
+        String domain = "192.168.50.23";
+        qXunWrapper.getLoginStatus(domain,  "7777");
         return null;
     }
 

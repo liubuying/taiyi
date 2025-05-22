@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlV
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
 
+import java.util.List;
+
 public interface WxAccountDomainRepository {
 
     /**
@@ -31,4 +33,6 @@ public interface WxAccountDomainRepository {
     Boolean bindEmployee(WxAccountPool wxAccountPool);
 
     Boolean unBindEmployee(WxAccountPool wxAccountPool);
+
+    List<WxAccountPool> queryWxAccountByEmployeeId(WxAccountPoolRequest poolRequest);
 }

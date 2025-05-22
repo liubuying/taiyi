@@ -71,6 +71,8 @@ public class WxAccountPool{
     private YesOrNoEnum isExpired;
 
     private Integer deleted;
+
+    private Integer status;
     /**
      * 创建时间
      */

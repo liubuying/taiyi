@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 
 import javax.validation.Valid;
+import java.util.List;
 
 public interface WxAccountPoolService {
 
@@ -28,5 +29,12 @@ public interface WxAccountPoolService {
     Boolean bindEmployee(WxAccountPoolVO wxAccountPoolVO);
 
     Boolean unBindEmployee(WxAccountPoolVO wxAccountPoolVO);
+
+    /**
+     * 根据员工id查询管理的账号池
+     * @param poolRequest
+     * @return
+     */
+    List<WxAccountPool> queryWxAccountByEmployeeId(WxAccountPoolRequest poolRequest);
 
 }

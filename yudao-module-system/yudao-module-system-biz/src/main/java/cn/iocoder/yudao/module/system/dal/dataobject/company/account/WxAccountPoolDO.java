@@ -77,6 +77,11 @@ public class WxAccountPoolDO{
      * 创建时间
      */
     private Date gmtCreate;
+
+    /**
+     * 账号状态 0 未分配 1 已分配
+     */
+    private Integer status;
     /**
      * 更新时间
      */
