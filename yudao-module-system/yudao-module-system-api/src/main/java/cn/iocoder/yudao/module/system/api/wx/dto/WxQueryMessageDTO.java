@@ -9,6 +9,12 @@ import java.util.Date;
 @Data
 public class WxQueryMessageDTO {
 
+
+    /**
+     * wx id
+     */
+    private String wxId;
+
     /**
      * 来源类型：1|私聊 2|群聊 3|公众号
      */

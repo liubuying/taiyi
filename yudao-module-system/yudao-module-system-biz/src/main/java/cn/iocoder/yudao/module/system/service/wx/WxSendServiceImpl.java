@@ -78,6 +78,7 @@ public abstract class WxSendServiceImpl implements WxSendService {
                 new LambdaQueryWrapper<WxSendDO>()
                         .ge(WxSendDO::getSendTime, startTime)  // >= 开始时间
                         .eq(WxSendDO::getFromType, endTime)  // >= 开始时间
+                        .eq(WxSendDO::getFromUser, dto.getWxId())  // >= 微信id
                         .eq(WxSendDO::getMsgType, dto.getMsgType())  // >= 消息类型
                         .le(WxSendDO::getSendStatus, dto.getSendStatus())    // 消息状态
                         .orderByDesc(WxSendDO::getSendTime)    // 按时间倒序
