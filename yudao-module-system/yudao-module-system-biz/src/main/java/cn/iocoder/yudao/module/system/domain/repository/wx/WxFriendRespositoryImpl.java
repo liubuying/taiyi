@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryDTO;
 import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.wx.WxFriendDO;
 import cn.iocoder.yudao.module.system.dal.mysql.wx.WxFriendMapper;
-import cn.iocoder.yudao.module.system.util.enums.WxFriendConstants;
+import cn.iocoder.yudao.module.system.domain.enums.WxFriendConstants;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.QXunWrapper;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunInfoFriend;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunInfoGroup;

@@ -15,7 +15,7 @@ public class WxFriendDO {
     /**
      * 主键id
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     /**
      * 好友微信id/群聊微信id

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.util.enums;
+package cn.iocoder.yudao.module.system.domain.enums;
 
 /**
  * 微信好友/群聊 枚举类
