@@ -200,7 +200,7 @@ public interface QXunWrapper {
      * @param toWxId 目标wxId
      * @return 响应对象
      */
-     QianXunResponse<Object> delFriend(String ip, String wxId, String toWxId);
+     QianXunResponse<QianXunLoginStatus> delFriend(String ip, String wxId, String toWxId);
 
     /**
      * 修改对象备注

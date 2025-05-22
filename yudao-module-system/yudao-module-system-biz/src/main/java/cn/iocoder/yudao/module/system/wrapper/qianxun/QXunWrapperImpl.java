@@ -376,7 +376,20 @@ public class QXunWrapperImpl implements QXunWrapper {
      */
     @Override
     public  QianXunResponse<Object> addFriendByGroupWxid(String ip, String wxId, String groupWxId, String toWxId, String message){
-        return null;
+        return sendRequest(
+                ip,
+                QIANXUN_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.ADD_FRIEND_BY_GROUP_WXID,
+                data ->{
+                    data.put("wxid",toWxId);
+                    data.put("gid",groupWxId);
+                    data.put("content",message);
+                    data.put("scene","14");
+                    return data;
+                },
+                Object.class
+        );
     }
 
     /**
@@ -388,8 +401,18 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @return 响应对象
      */
     @Override
-    public  QianXunResponse<Object> delFriend(String ip, String wxId, String toWxId){
-        return null;
+    public  QianXunResponse<QianXunLoginStatus> delFriend(String ip, String wxId, String toWxId){
+        return sendRequest(
+                ip,
+                QIANXUN_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.DEL_FRIEND,
+                data ->{
+                    data.put("wxid",toWxId);
+                    return data;
+                },
+                QianXunLoginStatus.class
+        );
     }
 
     /**
@@ -403,7 +426,18 @@ public class QXunWrapperImpl implements QXunWrapper {
      */
     @Override
     public  QianXunResponse<Object> editObjRemark(String ip, String wxId, String toWxId, String remark){
-        return null;
+        return sendRequest(
+                ip,
+                QIANXUN_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.EDIT_OBJ_REMARK,
+                data ->{
+                    data.put("wxid",toWxId);
+                    data.put("remark",remark);
+                    return data;
+                },
+                Object.class
+        );
     }
 
     // ==================== 群聊管理相关API =========================
@@ -492,21 +526,32 @@ public class QXunWrapperImpl implements QXunWrapper {
     // ==================== 发送消息相关API =========================
 
     /**
-     * 发送文本消息
+     * 发送文本消息 - 2048 字符
      *
      * @param ip 服务器域名
-     * @param wxId 微信ID
-     * @param toWxId 目标wxId
-     * @param content 消息内容
+     * @param wxId 要使用微信的wxid
+     * @param toWxId 对方wxid 要给谁，支持好友、群聊、公众号等
+     * @param msg 消息内容
      * @return 响应对象
      */
     @Override
-    public  QianXunResponse<QianXunMessage> sendText(String ip, String wxId, String toWxId, String content){
-        return null;
+    public  QianXunResponse<QianXunMessage> sendText(String ip, String wxId, String toWxId, String msg){
+        return sendRequest(
+                ip,
+                QIANXUN_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.SEND_TEXT,
+                data -> {
+                    data.put("wxid",toWxId);
+                    data.put("msg",msg);
+                    return data;
+                },
+                QianXunMessage.class
+        );
     }
 
     /**
-     * 发送文本消息2
+     * 发送文本消息2 -字符 无上限
      *
      * @param ip 服务器域名
      * @param wxId 微信ID
