@@ -6,18 +6,17 @@ import lombok.Data;
 @Data
 public class WxFriendVO {
 
-
     private String wxId; //微信id
 
-    private String type; //类型 1 好友 2群聊
+    private Integer type; //类型 1 好友 2群聊
 
     private String groupNumber; //类型 1 好友 2群聊
 
     private Integer groupNumberCount;  //群成员数量
 
-    private String groupMainWxId;  //群成员数量
+    private String groupManger;  //群主微信id
 
-    private String wxNum; //微信
+    private String wxNo; //微信
 
     private String nick;  //昵称
 
@@ -31,5 +30,5 @@ public class WxFriendVO {
 
     private String avatarMaxUrl;//头像大图
 
-    private String sex;//性别0=未知，1=男，2=女
+    private Integer sex;//性别0=未知，1=男，2=女
 }

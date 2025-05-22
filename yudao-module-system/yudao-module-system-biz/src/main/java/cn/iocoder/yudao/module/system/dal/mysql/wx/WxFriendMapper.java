@@ -59,7 +59,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
             "</script>")
    Long queryFriendDataListCount(@Param("nick")String  nick,@Param("wxId")String  wxId, @Param("type")String  type,@Param("tenantId") String tenantId);
 
-    default List<WxFriendDO> selectListByWxId(String  wxId){
-        return this.selectList(new LambdaQueryWrapper<WxFriendDO>().eq(WxFriendDO::getWxId, wxId));
+    default List<WxFriendDO> selectListByWxPersonId(String  wxId){
+        return this.selectList(new LambdaQueryWrapper<WxFriendDO>().eq(WxFriendDO::getWxPersonId, wxId));
     }
 }
