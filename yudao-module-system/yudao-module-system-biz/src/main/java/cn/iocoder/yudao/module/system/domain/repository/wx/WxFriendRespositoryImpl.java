@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryDTO;
 import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.wx.WxFriendDO;
@@ -40,40 +41,33 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
     @Override
     public CommonResult<PageResult<WxFriendVO>> queryFriendDataList(WxQueryDTO dto) {
         //1.查询redis中是否有数据
-        //2.redis中未查到，请求千寻接口
-        //3.将数据存入redis中
-        //4.将数据存入数据库
-        //5.返回数据给前端
-
+        String redisKey = formatKey(dto.getWxId());//formatKey(accessToken);
+        String redisData = stringRedisTemplate.opsForValue().get(redisKey); //RedisUtils.getValue(redisKey);//
+        List<WxFriendVO>   wxredisList= JsonUtils.parseArray(redisData,WxFriendVO.class);
+        //有直接返回
+        if(wxredisList.size()>0){
+            PageResult pageResult=new PageResult();
+            pageResult.setList(wxredisList.stream().limit(dto.getPageSize()).collect(Collectors.toList()));
+            pageResult.setTotal(Long.getLong(String.valueOf(wxredisList.size())));
+            return CommonResult.success(pageResult);
+        }
         // 标准计算公式 mysql偏移量
         int offset = (dto.getPageNo() - 1) * dto.getPageSize();
         List<WxFriendVO> wxList =wxFriendMapper.queryFriendDataList(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId(),offset,dto.getPageSize());
-
         if(wxList.size()>0){
             PageResult pageResult=new PageResult();
             pageResult.setList(wxList);
             pageResult.setTotal(wxFriendMapper.queryFriendDataListCount(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId()));
             return CommonResult.success(pageResult);
         }
-
+      //数据为空时拉取
         if(wxList.isEmpty()){
-
             //开始拉去微信好友列表
-            List<WxFriendDO> lists=getWxFriendList(dto.getWxId(),"getFriendList");
-
-            //拉取好友列表数据为空 没有添加好友
-            if(lists.size()>=0){
-                PageResult pageResult=new PageResult();
-                pageResult.setList(lists);
-                pageResult.setTotal(Long.getLong(String.valueOf(lists.size())));
-                if(lists.size()>0){
-                    log.info("数据落库开始");
-                    wxFriendMapper.insert(lists);
-                    log.info("数据落库结束");
-                }
-                return CommonResult.success(pageResult);
-            }
-
+            List<WxFriendVO> lists=getWxFriendList(dto.getWxId());
+            PageResult pageResult=new PageResult();
+            pageResult.setList(lists.stream().limit(dto.getPageSize()).collect(Collectors.toList()));
+            pageResult.setTotal(Long.getLong(String.valueOf(wxredisList.size())));
+            return CommonResult.success(pageResult);
         }
         PageResult pageResult=new PageResult();
         pageResult.setList(wxList);
@@ -84,11 +78,20 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
 
 
     //TO DO
-    private List<WxFriendDO> getWxFriendList(String wxId, String getFriendList) {
-        List<WxFriendDO> list=new ArrayList<>();
-
-
-        return list;
+    private List<WxFriendVO> getWxFriendList(String wxId) {
+        //1.调用千寻接口（好友、群聊）
+        List<WxFriendDO> wxFriendFromQx = getWxFriendGroupFromQx(wxId, WxFriendConstants.FRIEND_TYPE);
+        List<WxFriendDO> wxGroupFromQx = getWxFriendGroupFromQx(wxId, WxFriendConstants.GROUP_TYPE);
+        wxGroupFromQx.addAll(wxFriendFromQx);
+        //微信所属人
+        wxFriendFromQx.forEach(f->{
+            f.setWxPersonId(wxId);
+            f.setCreatorId(SecurityFrameworkUtils.getLoginUser().getId());
+            f.setTenantId(SecurityFrameworkUtils.getLoginUser().getTenantId());
+        });
+        wxFriendMapper.insertOrUpdate(wxGroupFromQx);
+        List<WxFriendVO>  listvo=BeanUtils.toBean(wxGroupFromQx,WxFriendVO.class);
+        return listvo;
     }
 
     @Override

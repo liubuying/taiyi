@@ -118,6 +118,10 @@ public class WxFriendDO {
      */
     private Long creatorId;
     /**
+     * 租户编号
+     */
+    private Long tenantId;
+    /**
      * 创建时间
      */
     private Date gmtCreate;
