@@ -97,9 +97,10 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
         //1.调用千寻接口（好友、群聊）
         List<WxFriendDO> wxFriendFromQx = getWxFriendGroupFromQx(wxid, WxFriendConstants.FRIEND_TYPE);
         List<WxFriendDO> wxGroupFromQx = getWxFriendGroupFromQx(wxid, WxFriendConstants.GROUP_TYPE);
+        List<WxFriendVO> redisList = new ArrayList<>();
 
         //只有获取到好友、群聊数据才执行以下逻辑
-        if(wxFriendFromQx == null || wxGroupFromQx == null){
+        if(wxFriendFromQx != null || wxGroupFromQx != null){
             wxFriendFromQx = wxFriendFromQx == null ? new ArrayList<>() : wxFriendFromQx;
             wxFriendFromQx.addAll(wxGroupFromQx);
             //2.获取数据库数据
@@ -112,12 +113,17 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
             //过滤出更新的数据
             List<WxFriendDO> updateList = wxFriendFromQx.stream()
                     // 先过滤出数据库存在的记录
-                    .filter(vo -> dbMap.containsKey(vo.getWxId()))
-                    .map(vo -> {
-                        WxFriendDO dbDO = dbMap.get(vo.getWxId());
-                        WxFriendDO updateDO = BeanUtils.toBean(vo, WxFriendDO.class);
+                    .filter(qxDo -> dbMap.containsKey(qxDo.getWxId()))
+                    .map(qxDo -> {
+                        WxFriendDO dbDO = dbMap.get(qxDo.getWxId());
+                        WxFriendDO updateDO = BeanUtils.toBean(qxDo, WxFriendDO.class);
                         updateDO.setId(dbDO.getId());
                         updateDO.setType(dbDO.getType());
+
+                        //组装redis数据
+                        WxFriendVO redisVo = BeanUtils.toBean(qxDo, WxFriendVO.class);
+                        redisList.add(redisVo);
+
                         return updateDO;
                     })
                     .filter(Objects::nonNull) // 过滤掉不需要更新的记录
@@ -126,13 +132,13 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
             //过滤需要插入的数据
             List<WxFriendDO> insertList = wxFriendFromQx.stream()
                     // 过滤出数据库不存在的记录
-                    .filter(vo -> !dbMap.containsKey(vo.getWxId()))
-                    .map(vo -> {
-                        WxFriendDO dbDO = BeanUtils.toBean(vo, WxFriendDO.class);
-                        //todo
+                    .filter(qxDo -> !dbMap.containsKey(qxDo.getWxId()))
+                    .map(qxDo -> {
+                        //组装redis数据
+                        WxFriendVO redisVo = BeanUtils.toBean(qxDo, WxFriendVO.class);
+                        redisList.add(redisVo);
 
-                        dbDO.setCreatorId(loginUserId);
-                        return dbDO;
+                        return qxDo;
                     })
                     .collect(Collectors.toList());
             //整合数据，插入数据库
@@ -141,31 +147,39 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
 
             //3.获取redis数据，redis先删除后全插入
 //        deleteWxFriendFromRedis(wxid);
-            //TODO
-//            setWxFriendToRedis(wxid, wxFriendFromQx);
+            setWxFriendToRedis(wxid, redisList);
         }
 
     }
 
     List<WxFriendDO> getWxFriendGroupFromQx(String wxid, Integer type){
+        Long loginUserId = getLoginUserId();
         //todo  1.调用千寻接口（好友、群聊）
         String ip = "192.168.50.23";
-        String wxidd = "wxid_f8zq0gmp9qih22";
         List<WxFriendDO> friendList;
         if(type.equals(WxFriendConstants.FRIEND_TYPE)){
             QianXunResponse<List<QianXunInfoFriend>> qxFriendList = qXunWrapper.getFriendList(ip, wxid);
-            friendList = BeanUtils.toBean(qxFriendList.getResult(), WxFriendDO.class);
+            friendList = qxFriendList.getResult().stream().map(qxFriend ->{
+                        WxFriendDO friendDO = BeanUtils.toBean(qxFriend, WxFriendDO.class);
+                        friendDO.setWxNo(qxFriend.getWxNum());
+                        friendDO.setWxId(qxFriend.getWxid());
+                        return friendDO;
+                    })
+                    .collect(Collectors.toList());
         }else{
-            QianXunResponse<List<QianXunInfoGroup>> qxGroupList = qXunWrapper.getGroupList(ip, wxidd);
+            QianXunResponse<List<QianXunInfoGroup>> qxGroupList = qXunWrapper.getGroupList(ip, wxid);
             friendList = qxGroupList.getResult().stream().map(qxGroup ->{
-                        WxFriendDO vo = BeanUtils.toBean(qxGroup, WxFriendDO.class);
-                        vo.setGroupNumberCount(qxGroup.getGroupMemberNum());
-                        return vo;
+                        WxFriendDO friendDO = BeanUtils.toBean(qxGroup, WxFriendDO.class);
+                        friendDO.setWxId(qxGroup.getWxid());
+                        friendDO.setGroupNumberCount(qxGroup.getGroupMemberNum());
+                        return friendDO;
                     })
                     .collect(Collectors.toList());
         }
 
         friendList.forEach(friend  -> {
+            friend.setCreatorId(loginUserId);
+            friend.setWxPersonId(wxid);
             friend.setType(type);
         });
         return friendList;

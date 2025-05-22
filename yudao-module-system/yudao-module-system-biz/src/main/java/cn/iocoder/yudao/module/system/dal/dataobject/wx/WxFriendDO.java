@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.util.Date;
 
-@TableName(value = "system_users", autoResultMap = true) // 由于 SQL Server 的 system_user 是关键字，所以使用 system_users
+@TableName(value = "taiyi_wx_friend_info", autoResultMap = true) // 由于 SQL Server 的 system_user 是关键字，所以使用 system_users
 @Data
 @ToString
 @Builder
@@ -128,6 +128,6 @@ public class WxFriendDO {
     /**
      * 是否删除
      */
-    @TableLogic
-    private Boolean deleted;
+//    @TableLogic
+//    private Boolean deleted;
 }
