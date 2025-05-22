@@ -14,7 +14,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
 
 
     @Select("<script>" +
-            "SELECT * FROM wx_friend_info " +
+            "SELECT * FROM taiyi_wx_friend_info " +
             "<where>" +
             "  <if test='nick != null and nick.trim() != \"\"'>" +
             "    <bind name=\"nick\" value=\"'%' + nick + '%'\" />" +
@@ -38,7 +38,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
 
 
     @Select("<script>" +
-            "SELECT count(*) FROM wx_friend_info " +
+            "SELECT count(*) FROM taiyi_wx_friend_info " +
             "<where>" +
             "  <if test='nick != null and nick.trim() != \"\"'>" +
             "    <bind name=\"nick\" value=\"'%' + nick + '%'\" />" +
