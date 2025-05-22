@@ -17,4 +17,10 @@ public class WechatQuery implements Serializable {
     private String wxLoginStaus;
 
     private Long employeeId;
+
+    private String domain;
+
+    private String port;
+
+    private String pid;
 }

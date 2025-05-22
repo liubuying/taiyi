@@ -4,8 +4,7 @@ import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.format.annotation.DateTimeFormat;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
+import java.util.Date;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -40,16 +39,18 @@ public class CompanyPageReqVO extends PageParam {
     private String officeAddress;
 
     @Schema(description = "入驻日期")
-    private LocalDate[] entryDate;
+    private Date[] entryDate;
 
     @Schema(description = "退出日期")
-    private LocalDate[] exitDate;
+    private Date[] exitDate;
 
     @Schema(description = "状态", example = "1")
     private Integer status;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] createTime;
+    private Date createTime;
+    
+    private Long tenantId;
 
 }

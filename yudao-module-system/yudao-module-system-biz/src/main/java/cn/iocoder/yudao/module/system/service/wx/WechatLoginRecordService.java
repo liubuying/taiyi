@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.wx.WechatLoginRecordDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 微信用户登录记录 Service 接口
@@ -52,4 +53,17 @@ public interface WechatLoginRecordService {
      */
     PageResult<WechatLoginRecordDO> getWechatLoginRecordPage(WechatLoginRecordPageReqVO pageReqVO);
 
+    /**
+     * 根据微信ID获取已登录微信账号列表
+     * @param wxUnionIdList
+     * @return
+     */
+    List<WechatLoginRecordDO> getOnlineWechatAccountsByWxIdList(List<String> wxUnionIdList);
+
+    /**
+     * 根据IP获取已登录微信账号列表
+     * @param domainList
+     * @return
+     */
+    List<WechatLoginRecordDO> getOnlineWechatAccountsByDomainUrl(List<String> domainList);
 }

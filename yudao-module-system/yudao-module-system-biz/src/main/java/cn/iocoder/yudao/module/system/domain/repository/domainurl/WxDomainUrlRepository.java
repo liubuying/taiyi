@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlV
 import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 
+import java.util.List;
+
 public interface WxDomainUrlRepository {
 
     /**
@@ -16,4 +18,6 @@ public interface WxDomainUrlRepository {
     Long deleteDomainUrl(WxDomainUrlVO domainUrlVO);
 
     void saveDomainUrl(DomainName domainName);
+
+    List<DomainName> selectList(DomainNameRequest domainNameRequest);
 }

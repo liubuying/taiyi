@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.enums;
 
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 
 /**
  * System 错误码枚举类
@@ -184,5 +185,11 @@ public interface ErrorCodeConstants {
     ErrorCode DATA_NOT_EXISTS = new ErrorCode(1_003_001_001, "数据不存在");
 
     ErrorCode WECHAT_LOGIN_RECORD_NOT_EXISTS = new ErrorCode(1_003_001_002, "微信用户登录记录不存在");
+    ErrorCode EMPLOYEE_NOT_BIND_WECHAT = new ErrorCode(1_003_001_003, "请先绑定微信");
+    ErrorCode EMPLOYEE_NOT_LOGIN_WECHAT = new ErrorCode(1_003_001_003, "没有可以登录的微信账号，请增加新的微信号");
 
+    ErrorCode WECHAT_LOGIN_QRCODE_ERROR = new ErrorCode(1_003_001_005, "获取登录二维码失败，请稍后再试");
+    ErrorCode SYSTEM_ERROR = new ErrorCode(1_003_001_500, "系统异常，请稍后再试");
+    ErrorCode DOMAIN_NOT_FOUND = new ErrorCode(1_003_001_006, "");
+    ErrorCode IP_SELECTION_FAILED = new ErrorCode(1_003_001_007, "分配IP失败");
 }

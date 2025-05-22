@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class WxDomainUrlServiceImpl implements WxDomainUrlService{
@@ -42,6 +44,11 @@ public class WxDomainUrlServiceImpl implements WxDomainUrlService{
     public CommonResult<Boolean> deleteDomainUrl(WxDomainUrlVO domainUrlVO) {
         Long i = wxDomainUrlRepository.deleteDomainUrl(domainUrlVO);
         return CommonResult.success(i > 0);
+    }
+
+    @Override
+    public List<DomainName> queryAllDomainUrl(DomainNameRequest domainNameRequest) {
+        return wxDomainUrlRepository.selectList(domainNameRequest);
     }
 
 

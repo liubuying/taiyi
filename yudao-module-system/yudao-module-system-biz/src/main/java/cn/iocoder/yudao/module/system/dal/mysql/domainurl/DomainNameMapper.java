@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.domainurl.DomainNameDO;
 
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -25,6 +26,14 @@ public interface DomainNameMapper extends BaseMapperX<DomainNameDO> {
                 .eqIfPresent(DomainNameDO::getStatus, reqVO.getDomainStatus())
                 .eqIfPresent(DomainNameDO::getCompanyId, reqVO.getCompanyId())
                 .orderByDesc(DomainNameDO::getId));
+    }
+
+    default List<DomainNameDO> selectList(DomainNameRequest reqVO) {
+        return selectList(new LambdaQueryWrapperX<DomainNameDO>()
+                .likeIfPresent(DomainNameDO::getDomainName, reqVO.getDomainName())
+                .eqIfPresent(DomainNameDO::getStatus, reqVO.getDomainStatus())
+                .eqIfPresent(DomainNameDO::getCompanyId, reqVO.getCompanyId())
+                .eq(DomainNameDO::getDeleted, 0));
     }
 
 }

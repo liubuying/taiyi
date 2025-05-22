@@ -4,6 +4,9 @@ import cn.iocoder.yudao.module.system.controller.admin.wechat.vo.WechatLoginReco
 import cn.iocoder.yudao.module.system.controller.admin.wechat.vo.WechatLoginRecordSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.wx.WechatLoginRecordDO;
 import cn.iocoder.yudao.module.system.dal.mysql.wx.WechatLoginRecordMapper;
+import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import java.util.*;
@@ -68,6 +71,30 @@ public class WechatLoginRecordServiceImpl implements WechatLoginRecordService {
     @Override
     public PageResult<WechatLoginRecordDO> getWechatLoginRecordPage(WechatLoginRecordPageReqVO pageReqVO) {
         return wechatLoginRecordMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<WechatLoginRecordDO> getOnlineWechatAccountsByWxIdList(List<String> wxUnionIdList) {
+        // 查询数据
+        if (CollectionUtils.isEmpty(wxUnionIdList)) {
+            return Collections.emptyList();
+        }
+        return wechatLoginRecordMapper.selectList(new LambdaQueryWrapper<WechatLoginRecordDO>()
+                .in(CollectionUtils.isNotEmpty(wxUnionIdList), WechatLoginRecordDO::getWxUnionId, wxUnionIdList)
+                .eq(WechatLoginRecordDO::getDeleted, YesOrNoEnum.NO.getStatus())
+                .eq(WechatLoginRecordDO::getIsOffline, YesOrNoEnum.NO.getStatus()));
+    }
+
+    @Override
+    public List<WechatLoginRecordDO> getOnlineWechatAccountsByDomainUrl(List<String> domainList) {
+        // 查询数据
+        if (CollectionUtils.isEmpty(domainList)) {
+            return Collections.emptyList();
+        }
+        return wechatLoginRecordMapper.selectList(new LambdaQueryWrapper<WechatLoginRecordDO>()
+                .in(CollectionUtils.isNotEmpty(domainList), WechatLoginRecordDO::getIp, domainList)
+                .eq(WechatLoginRecordDO::getDeleted, YesOrNoEnum.NO.getStatus())
+                .eq(WechatLoginRecordDO::getIsOffline, YesOrNoEnum.NO.getStatus()));
     }
 
 }

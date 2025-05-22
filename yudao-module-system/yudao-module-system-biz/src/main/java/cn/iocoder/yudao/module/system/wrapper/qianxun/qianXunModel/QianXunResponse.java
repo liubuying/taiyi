@@ -35,6 +35,7 @@ public class QianXunResponse<T> {
     private String port;
     private String pid;
     private String flag;
+    private String domain;
 
 
     public static <T> QianXunResponse<T> error(Integer code, String message) {

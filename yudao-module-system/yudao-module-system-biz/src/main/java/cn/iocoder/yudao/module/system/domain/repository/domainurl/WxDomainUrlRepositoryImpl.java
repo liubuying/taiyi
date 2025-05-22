@@ -36,22 +36,26 @@ public class WxDomainUrlRepositoryImpl implements WxDomainUrlRepository{
         PageResult<DomainNameDO> domainNameDOPageResult = domainNameMapper.selectPage(reqVO);
         if (domainNameDOPageResult != null) {
             PageResult<DomainName> domainNamePageResult = new PageResult<>();
-            Set<Long> creatorIdList = domainNameDOPageResult.getList().stream()
-                    .filter(domainNameDO -> domainNameDO.getCreatorId() != null)
-                    .map(DomainNameDO::getCreatorId)
-                    .collect(Collectors.toSet());
-            Set<Long> operatorIdList = domainNameDOPageResult.getList().stream()
-                    .filter(domainNameDO -> domainNameDO.getOperatorId() != null)
-                    .map(DomainNameDO::getOperatorId)
-                    .collect(Collectors.toSet());
-            creatorIdList.addAll(operatorIdList);
-            List<UserInfo> userInfos = employeeDomainRepository.queryEmployeeList(new ArrayList<Long>(creatorIdList));
-            Map<Long, UserInfo> userInfoMap = userInfos.stream().collect(Collectors.toMap(UserInfo::getUserId, userInfo -> userInfo));
+            getUserInfoMap(domainNameDOPageResult.getList());
             domainNamePageResult.setList(WxDomainUrlConvert.INSTANCE.convertList(domainNameDOPageResult.getList(),userInfoMap));
             domainNamePageResult.setTotal(domainNameDOPageResult.getTotal());
             return domainNamePageResult;
         }
         return PageResult.empty();
+    }
+
+    private Map<Long, UserInfo> getUserInfoMap(List<DomainNameDO> list) {
+        Set<Long> creatorIdList = list.stream()
+                .filter(domainNameDO -> domainNameDO.getCreatorId() != null)
+                .map(DomainNameDO::getCreatorId)
+                .collect(Collectors.toSet());
+        Set<Long> operatorIdList = list.stream()
+                .filter(domainNameDO -> domainNameDO.getOperatorId() != null)
+                .map(DomainNameDO::getOperatorId)
+                .collect(Collectors.toSet());
+        creatorIdList.addAll(operatorIdList);
+        List<UserInfo> userInfos = employeeDomainRepository.queryEmployeeList(new ArrayList<Long>(creatorIdList));
+        return userInfos.stream().collect(Collectors.toMap(UserInfo::getUserId, userInfo -> userInfo));
     }
 
     @Override
@@ -75,6 +79,12 @@ public class WxDomainUrlRepositoryImpl implements WxDomainUrlRepository{
         } else {
             addDomain(domainName);
         }
+    }
+
+    @Override
+    public List<DomainName> selectList(DomainNameRequest domainNameRequest) {
+        List<DomainNameDO> domainNameDOS = domainNameMapper.selectList(domainNameRequest);
+        return WxDomainUrlConvert.INSTANCE.convertList(domainNameDOS,getUserInfoMap(domainNameDOS));
     }
 
 

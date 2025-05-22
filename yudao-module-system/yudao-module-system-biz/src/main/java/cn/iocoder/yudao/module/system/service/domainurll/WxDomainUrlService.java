@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlV
 import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 
+import java.util.List;
+
 public interface WxDomainUrlService {
 
     PageResult<DomainName> selectPage(DomainNameRequest domainNameRequest);
@@ -16,4 +18,5 @@ public interface WxDomainUrlService {
 
     CommonResult<Boolean> deleteDomainUrl(WxDomainUrlVO domainUrlVO);
 
+    List<DomainName> queryAllDomainUrl(DomainNameRequest domainNameRequest);
 }
