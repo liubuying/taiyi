@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.system.domain.enums.AccountTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Schema(description = "管理后台 - 公司账号池请求对象")
 @NoArgsConstructor
@@ -44,6 +46,16 @@ public class WxAccountPoolRequest extends PageParam {
 
     @Schema(description = "是否过期")
     private String isExpired ;
+
+
+    /**
+     * 0 未分配 1已分配
+     */
+    @Schema(description = "是否分配")
+    private Integer status;
+
+    private List<String> wxUnionIdList;
+
 
 
 }

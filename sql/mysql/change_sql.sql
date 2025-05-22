@@ -1,3 +1,30 @@
+ALTER TABLE taiyi_db.taiyi_wechat_login_record ADD deleted INT DEFAULT 0 NULL COMMENT '删除 0 未删除 1删除';
+
+
+ALTER TABLE taiyi_db.taiyi_wechat_login_record ADD creator_id BIGINT NOT NULL COMMENT '创建人';
+ALTER TABLE taiyi_db.taiyi_wechat_login_record ADD operator_id BIGINT NULL COMMENT '操作人ID';
+
+
+CREATE TABLE taiyi_db.taiyi_wechat_login_record (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '自增主键ID',
+    employee_user_id BIGINT COMMENT '员工ID',
+    wx_union_id VARCHAR(128) COMMENT '微信UnionId',
+    wx_no VARCHAR(64) NOT NULL COMMENT '微信No',
+    nickname VARCHAR(64) COMMENT '昵称',
+    login_qr_code VARCHAR(255) COMMENT '登录二维码',
+    port INT COMMENT '端口',
+    pid INT COMMENT '进程ID',
+    ip VARCHAR(64) COMMENT 'IP',
+    login_time DATETIME COMMENT '登录时间',
+    gmt_create    DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    gmt_modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    is_offline TINYINT(1) DEFAULT 0 COMMENT '是否下线（0-在线，1-下线）'
+) COMMENT='微信用户登录记录表';
+
+
+ALTER TABLE taiyi_db.taiyi_wx_account_pool ADD status INT DEFAULT 0 NOT NULL COMMENT '账号状态 0 未分配 1 已分配';
+
+
 ALTER TABLE taiyi_db.taiyi_domain_wx_account_relation ADD deleted INT DEFAULT 0 NOT NULL COMMENT '是否删除';
 
 

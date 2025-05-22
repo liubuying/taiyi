@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class WxAccountPoolServiceImpl implements WxAccountPoolService{
@@ -127,4 +129,20 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
         }
         return null;
     }
+
+    @Override
+    public List<WxAccountPool> queryWxAccountByEmployeeId(WxAccountPoolRequest poolRequest) {
+        log.info("查询员工绑定账号池数据, params:{}", JSON.toJSONString(poolRequest));
+        try {
+            // 查询当前员工绑定微信号和域名数据
+            return wxAccountDomainRepository.queryWxAccountByEmployeeId(poolRequest);
+        }catch (Exception e){
+            log.error("查询员工绑定账号池数据,params:{}",JSON.toJSONString(poolRequest), e);
+        }
+         return null;
+    }
+
+
+
+
 }

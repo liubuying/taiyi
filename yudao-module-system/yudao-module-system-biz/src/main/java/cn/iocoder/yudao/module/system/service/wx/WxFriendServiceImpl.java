@@ -4,11 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryDTO;
 import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
-import cn.iocoder.yudao.module.system.domain.model.wx.WxFriend;
 import cn.iocoder.yudao.module.system.domain.repository.wx.WxFriendRespository;
-import cn.iocoder.yudao.module.system.wrapper.qianxun.QXunWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

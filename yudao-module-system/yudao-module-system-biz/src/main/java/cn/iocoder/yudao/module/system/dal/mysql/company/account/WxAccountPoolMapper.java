@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.system.dal.dataobject.company.account.WxAccountPoolDO;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -27,6 +28,8 @@ public interface WxAccountPoolMapper extends BaseMapperX<WxAccountPoolDO> {
                 .eqIfPresent(WxAccountPoolDO::getOperatorId, request.getOperatorId())
                 .eqIfPresent(WxAccountPoolDO::getIsExpired, request.getIsExpired())
                 .eqIfPresent(WxAccountPoolDO::getDeleted, 0)
+                .isNotNull(CollectionUtils.isNotEmpty(request.getWxUnionIdList()), WxAccountPoolDO::getUnionId)
+                .in(WxAccountPoolDO::getUnionId, request.getWxUnionIdList())
                 .orderByDesc(WxAccountPoolDO::getId));
     }
 

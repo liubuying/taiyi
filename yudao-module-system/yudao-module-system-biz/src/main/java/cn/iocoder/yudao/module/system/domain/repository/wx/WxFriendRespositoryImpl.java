@@ -96,7 +96,6 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
 
     @Override
     public void refreshWxFriendFromQianxun(String wxid) {
-        Long loginUserId = getLoginUserId();
         //1.调用千寻接口（好友、群聊）
         List<WxFriendDO> wxFriendFromQx = getWxFriendGroupFromQx(wxid, WxFriendConstants.FRIEND_TYPE);
         List<WxFriendDO> wxGroupFromQx = getWxFriendGroupFromQx(wxid, WxFriendConstants.GROUP_TYPE);
@@ -159,29 +158,34 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
         Long loginUserId = getLoginUserId();
         //todo  1.调用千寻接口（好友、群聊）
         String ip = "192.168.50.23";
-        List<WxFriendDO> friendList;
+        List<WxFriendDO> friendList = new ArrayList<>();
         if(type.equals(WxFriendConstants.FRIEND_TYPE)){
             QianXunResponse<List<QianXunInfoFriend>> qxFriendList = qXunWrapper.getFriendList(ip, wxid);
-            friendList = qxFriendList.getResult().stream().map(qxFriend ->{
-                        WxFriendDO friendDO = BeanUtils.toBean(qxFriend, WxFriendDO.class);
-                        friendDO.setWxNo(qxFriend.getWxNum());
-                        friendDO.setWxId(qxFriend.getWxid());
-                        return friendDO;
-                    })
-                    .collect(Collectors.toList());
+            if(qxFriendList.getCode().equals(200)){
+                friendList = qxFriendList.getResult().stream().map(qxFriend ->{
+                            WxFriendDO friendDO = BeanUtils.toBean(qxFriend, WxFriendDO.class);
+                            friendDO.setWxNo(qxFriend.getWxNum());
+                            friendDO.setWxId(qxFriend.getWxid());
+                            return friendDO;
+                        })
+                        .collect(Collectors.toList());
+            }
         }else{
             QianXunResponse<List<QianXunInfoGroup>> qxGroupList = qXunWrapper.getGroupList(ip, wxid);
-            friendList = qxGroupList.getResult().stream().map(qxGroup ->{
-                        WxFriendDO friendDO = BeanUtils.toBean(qxGroup, WxFriendDO.class);
-                        friendDO.setWxId(qxGroup.getWxid());
-                        friendDO.setGroupNumberCount(qxGroup.getGroupMemberNum());
-                        return friendDO;
-                    })
-                    .collect(Collectors.toList());
+            if(qxGroupList.getCode().equals(200)){
+                friendList = qxGroupList.getResult().stream().map(qxGroup ->{
+                            WxFriendDO friendDO = BeanUtils.toBean(qxGroup, WxFriendDO.class);
+                            friendDO.setWxId(qxGroup.getWxid());
+                            friendDO.setGroupNumberCount(qxGroup.getGroupMemberNum());
+                            return friendDO;
+                        })
+                        .collect(Collectors.toList());
+            }
         }
 
         friendList.forEach(friend  -> {
-            friend.setCreatorId(loginUserId);
+            friend.setCreatorId(getLoginUserId());
+            friend.setTenantId((SecurityFrameworkUtils.getLoginUser().getTenantId()));
             friend.setWxPersonId(wxid);
             friend.setType(type);
         });
