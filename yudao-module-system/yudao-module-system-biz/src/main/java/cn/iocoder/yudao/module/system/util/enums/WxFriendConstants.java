@@ -6,6 +6,6 @@ package cn.iocoder.yudao.module.system.util.enums;
  *
  */
 public interface WxFriendConstants {
-    String FRIEND_TYPE = "1";
-    String GROUP_TYPE = "2";
+    Integer FRIEND_TYPE = 1;
+    Integer GROUP_TYPE = 2;
 }

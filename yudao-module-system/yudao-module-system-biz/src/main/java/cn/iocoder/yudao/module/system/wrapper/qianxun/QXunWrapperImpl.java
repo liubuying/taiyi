@@ -1,5 +1,4 @@
 package cn.iocoder.yudao.module.system.wrapper.qianxun;
-
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
@@ -8,6 +7,7 @@ import cn.iocoder.yudao.module.system.enums.qianxun.QianXunApiTypeEnum;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 import java.util.HashMap;
@@ -24,8 +24,8 @@ import java.util.function.Function;
 @Service
 public class QXunWrapperImpl implements QXunWrapper {
 
-    private static String QIANXUN_REQUEST_URL_PATH = "/qianxun/httpapi";
-    private static String WECHAT_REQUEST_URL_PATH = "/wechat/httpapi";
+    private static final String QIANXUN_REQUEST_URL_PATH = ":7777/qianxun/httpapi";
+    private static final String WECHAT_REQUEST_URL_PATH = "/wechat/httpapi";
 
     // ==================== 登录相关API =========================
 
@@ -55,7 +55,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      */
     @Override
     public  QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, String prot){
-        ip = ip + prot;
+        ip = ip + ":" + prot;
         return sendRequest(
                 ip,
                 WECHAT_REQUEST_URL_PATH,
@@ -92,7 +92,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      */
     @Override
     public QianXunResponse<Object> killWeChat(String ip, String prot){
-        ip = ip + prot;
+        ip = ip + ":" + prot;
         return sendRequest(
                 ip,
                 WECHAT_REQUEST_URL_PATH,
@@ -772,7 +772,8 @@ public class QXunWrapperImpl implements QXunWrapper {
             String path,
             String wxid,
             QianXunApiTypeEnum apiType,
-            Function<Map<String, Object>, Map<String, Object>> dataBuilder,Class<T> tClass
+            Function<Map<String, Object>, Map<String, Object>> dataBuilder,
+            Class<T> tClass
     ) {
         return sendBaseRequest(
                 ip,
@@ -845,10 +846,11 @@ public class QXunWrapperImpl implements QXunWrapper {
 
         try {
             // 构建请求URL
-            String url = ip + path;
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(ip + path);
             if (wxid != null && !wxid.isEmpty()) {
-                url += "?wxid=" + wxid;
+                builder.queryParam("wxid", wxid);
             }
+            String url = builder.toUriString();
 
             // 构建请求体
             Map<String, Object> requestBody = new HashMap<>();
@@ -856,7 +858,7 @@ public class QXunWrapperImpl implements QXunWrapper {
 
             // 使用数据构建器构建data部分
             Map<String, Object> data = new HashMap<>();
-            Map<String, Object> builtData = dataBuilder.apply(data);
+            Map<String, Object> builtData = dataBuilder != null ? dataBuilder.apply(data) : null;
             if (builtData != null && !builtData.isEmpty()) {
                 requestBody.put("data", builtData);
             }
@@ -879,10 +881,14 @@ public class QXunWrapperImpl implements QXunWrapper {
             response.setCode(code);
             response.setMsg(msg);
             response.setTimestamp(timestamp);
+            response.setWxid(rootNode.path("wxid").asText());
+            response.setPort(rootNode.path("port").asText());
+            response.setPid(rootNode.path("pid").asText());
+            response.setFlag(rootNode.path("flag").asText());
 
             // 如果有data字段且状态码为200，解析data
-            if (code == 200 && rootNode.has("data")) {
-                R result = responseProcessor.apply(rootNode.path("data"));
+            if (code == 200 && rootNode.has("result")) {
+                R result = responseProcessor.apply(rootNode.path("result"));
                 response.setResult(result);
             }
 

@@ -28,6 +28,14 @@ public class QianXunResponse<T> {
      */
     private T result;
 
+    /**
+     * 用于登录相关API
+     */
+    private String wxid;
+    private String port;
+    private String pid;
+    private String flag;
+
 
     public static <T> QianXunResponse<T> error(Integer code, String message) {
 
@@ -35,7 +43,7 @@ public class QianXunResponse<T> {
         result.code = code;
         result.msg = message;
         long  time = System.currentTimeMillis();
-        result.timestamp = Long.toString(time);;
+        result.timestamp = Long.toString(time);
         return result;
     }
 }
