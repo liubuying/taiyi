@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.controller.admin.callback;
 
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.module.system.controller.admin.callback.impl.QianXunCallbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,7 +59,7 @@ public class CallBackCpntroller {
         }
 
         // 处理回调事件
-        qianXunCallbackService.handleCallback(callbackData);
+        qianXunCallbackService.handleQianXunCallback(callbackData);
 
         // 返回成功
         return success(true);

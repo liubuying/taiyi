@@ -36,7 +36,7 @@ public class WxDomainUrlRepositoryImpl implements WxDomainUrlRepository{
         PageResult<DomainNameDO> domainNameDOPageResult = domainNameMapper.selectPage(reqVO);
         if (domainNameDOPageResult != null) {
             PageResult<DomainName> domainNamePageResult = new PageResult<>();
-            getUserInfoMap(domainNameDOPageResult.getList());
+            Map<Long, UserInfo> userInfoMap = getUserInfoMap(domainNameDOPageResult.getList());
             domainNamePageResult.setList(WxDomainUrlConvert.INSTANCE.convertList(domainNameDOPageResult.getList(),userInfoMap));
             domainNamePageResult.setTotal(domainNameDOPageResult.getTotal());
             return domainNamePageResult;

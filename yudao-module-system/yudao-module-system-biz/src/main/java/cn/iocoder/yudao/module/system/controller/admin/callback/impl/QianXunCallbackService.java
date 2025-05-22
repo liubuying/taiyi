@@ -12,7 +12,7 @@ public interface QianXunCallbackService {
      *
      * @param requestBody 请求体JSON内容
      */
-    void handleCallback(String requestBody);
+    void handleQianXunCallback(String requestBody);
 
     /**
      * 处理账号变动事件(10014)

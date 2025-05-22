@@ -127,6 +127,9 @@ public interface RedisKeyConstants {
      * KEY 格式：wx_group_person:{wxid}
      * VALUE 数据格式 String, 模版信息
      */
-    String WX_GROUP_PERSON =  "wx_group_person:%s";//":%s";
+    String WX_GROUP_PERSON =  "wx_group_person:%s";//":%s"// ;
+
+    // Redis中存储端口与二维码信息的键前缀
+    String REDIS_PORT_KEY_PREFIX = "qianxun:port:";
 
 }

@@ -1,43 +1,250 @@
+
 package cn.iocoder.yudao.module.system.controller.admin.callback.impl;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.system.controller.admin.callback.vo.event.QianXunAccountChangeEventVo;
-import cn.iocoder.yudao.module.system.enums.qianxun.QianXunCallbackTypeEnum;
+import cn.iocoder.yudao.module.system.controller.admin.wechat.vo.WechatLoginRecordSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.wxpool.vo.WxAccountPoolVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.wx.WechatLoginRecordDO;
+import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
+import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
+import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
+import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
+import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
+import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
+import cn.iocoder.yudao.module.system.service.domainurll.WxDomainUrlService;
+import cn.iocoder.yudao.module.system.service.wx.WechatLoginRecordService;
+import cn.iocoder.yudao.module.system.service.wxpool.WxAccountPoolService;
+import cn.iocoder.yudao.module.system.util.cache.RedisUtils;
+import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunQrCode;
+import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunResponse;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.Objects;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Map;
+import javax.annotation.Resource;
+
+import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.REDIS_PORT_KEY_PREFIX;
 
 @Slf4j
 public class QianXunCallbackServiceImpl implements QianXunCallbackService {
+
+    private static final String UNKNOWN = "未知";
+    private static final UserInfo DEFAULT_USER_INFO = new UserInfo();
+
+    @Resource
+    private WechatLoginRecordService wechatLoginRecordService;
+
+    @Resource
+    private WxAccountPoolService wxAccountPoolService;
+
+    @Resource
+    private WxDomainUrlService wxDomainUrlService;
+
     /**
      * 处理通用回调
      *
      * @param requestBody 请求体JSON内容
      */
     @Override
-    public void handleCallback(String requestBody) {
+    public void handleQianXunCallback(String requestBody) {
         try {
-            // 解析回调数据
-            Map<String, Object> callbackData = JsonUtils.parseObject(requestBody, Map.class);
-            // 获取事件类型
-            String eventType = callbackData.get("event").toString();
-            if (eventType == null) {
-                log.warn("[handleCallback][回调数据缺少event字段] 数据: {}", callbackData);
-                return;
-            }
+            log.info("收到千寻回调数据: {}", requestBody);
 
-            // 根据事件类型分发处理
-            switch (eventType) {
-                case QianXunCallbackTypeEnum.wxidChange: // 账号变动事件(10014)
-                    handleAccountChange(callbackData);
-                    break;
-                default:
-                    log.warn("[handleCallback][未知的事件类型] 类型: {}, 数据: {}", eventType, callbackData);
+            // 解析回调JSON数据
+            JSONObject jsonObj = JSONObject.parseObject(requestBody);
+            Integer event = jsonObj.getInteger("event");
+            String wxid = jsonObj.getString("wxid");
+            JSONObject data = jsonObj.getJSONObject("data");
+
+            if (event == 10014) { // 登录状态变更事件
+                Integer type = data.getInteger("type");
+                Integer port = data.getInteger("port");
+
+                // 校验端口范围
+                if (port == null || port <= 0 || port > 65535) {
+                    log.warn("无效的端口号: {}", port);
+                    return;
+                }
+
+                // 获取Redis中的缓存数据
+                String cacheKey = REDIS_PORT_KEY_PREFIX + port;
+                String cacheData = RedisUtils.getValue(cacheKey);
+
+                if (!StringUtils.hasText(cacheData)) {
+                    log.warn("未找到端口{}的缓存数据", port);
+                    return;
+                }
+
+                List<QianXunResponse<?>> qrCodeList;
+                try {
+                    qrCodeList = JSON.parseObject(cacheData, new TypeReference<List<QianXunResponse<?>>>(){});
+                } catch (Exception e) {
+                    log.warn("端口{}的缓存数据解析失败", port, e);
+                    return;
+                }
+
+                if (qrCodeList == null || qrCodeList.isEmpty()) {
+                    log.warn("端口{}的缓存数据解析失败", port);
+                    return;
+                }
+
+                // 获取IP地址（从缓存数据中提取）
+                String serverIp = qrCodeList.get(0).getDomain();
+
+                boolean handledSuccessfully = false;
+                try {
+                    if (type == 1) { // 登录事件
+                        handleLogin(wxid, port, serverIp, data);
+                        handledSuccessfully = true;
+                    } else if (type == 0) { // 登出事件
+                        handleLogout(wxid, port, serverIp);
+                        handledSuccessfully = true;
+                    }
+                } finally {
+                    // 清除Redis缓存
+                    if (handledSuccessfully) {
+                        RedisUtils.delValue(cacheKey);
+                        log.info("已清除端口{}的缓存数据", port);
+                    }
+                }
             }
+        } catch (IllegalArgumentException e) {
+            log.warn("处理千寻回调参数异常", e);
         } catch (Exception e) {
-            log.error("[handleCallback][处理回调异常]", e);
+            log.error("处理千寻回调异常", e);
+            throw new RuntimeException("处理千寻回调异常", e);
+        }
+    }
+
+    /**
+     * 处理登录事件
+     */
+    private void handleLogin(String wxid, Integer port, String serverIp, JSONObject data) {
+        log.info("处理微信登录事件: wxid={}, port={}, serverIp={}", wxid, port, serverIp);
+
+        // 查询域名数据
+        DomainNameRequest domainNameRequest = new DomainNameRequest();
+        domainNameRequest.setDomain(serverIp);
+        List<DomainName> domainNames = wxDomainUrlService.queryAllDomainUrl(domainNameRequest);
+        if(CollectionUtils.isEmpty(domainNames)){
+            log.info("handleLogin 查询的域名不存在,param:{}",data.toJSONString());
+            return;
+        }
+
+        DomainName domainName = domainNames.get(0);
+
+        // 查询IP和微信ID以及在线状态和未删除状态查询登录记录表
+        List<WechatLoginRecordDO> existingLoginRecord = getExistingLoginRecord(wxid);
+
+        // 如果存在记录，先删除
+        if (CollectionUtils.isNotEmpty(existingLoginRecord)) {
+            Optional<WechatLoginRecordDO> optionalRecord = existingLoginRecord.stream()
+                    .filter(record -> serverIp.equals(record.getIp()))
+                    .findFirst();
+            optionalRecord.ifPresent(record -> {
+                wechatLoginRecordService.deleteWechatLoginRecord(record.getId());
+                log.info("已删除微信ID{}的登录记录", wxid);
+            });
+        }
+
+        addWechatLoginRecord(wxid, serverIp, port, data);
+
+        if(!existingWxPool(wxid)){
+            addAccountPool(wxid, data);
+        }
+
+        // 在查询一遍数据
+        WxAccountPoolRequest request = new WxAccountPoolRequest();
+        request.setUnionId(wxid);
+        PageResult<WxAccountPool> result = wxAccountPoolService.queryWxAccountPoolForPage(request);
+
+        // 绑定微信ID和IP
+        WxAccountPoolVO bindWxAccountPoolVO = new WxAccountPoolVO();
+        bindWxAccountPoolVO.setDomainName(domainName);
+        bindWxAccountPoolVO.setId(result.getList().get(0).getId());
+        bindWxAccountPoolVO.setUnionId(wxid);
+        bindWxAccountPoolVO.setCreator(DEFAULT_USER_INFO);
+        wxAccountPoolService.bindDomainUrl(bindWxAccountPoolVO);
+        log.info("已绑定微信ID{}与IP{}", wxid, serverIp);
+    }
+
+    private void addAccountPool(String wxid, JSONObject data) {
+        // 保存到微信公共池
+        WxAccountPoolVO accountPool = new WxAccountPoolVO();
+        accountPool.setDeleted(YesOrNoEnum.NO.getStatus());
+        accountPool.setAccountType("wechat");
+        accountPool.setUnionId(wxid);
+        accountPool.setNickName(data.getString("nick"));
+        accountPool.setAvatar(data.getString("avatarUrl"));
+        accountPool.setPhone(data.getString("phone"));
+        accountPool.setEmail(data.getString("email"));
+        accountPool.setIsExpired(YesOrNoEnum.NO); // 未过期
+        accountPool.setCreator(DEFAULT_USER_INFO); // 根据业务设置正确的操作员ID
+
+        wxAccountPoolService.saveWxAccountPool(accountPool);
+        log.info("已保存微信ID{}到公共池", wxid);
+    }
+
+    private Boolean existingWxPool(String wxid) {
+        WxAccountPoolRequest request = new WxAccountPoolRequest();
+        request.setUnionId(wxid);
+        PageResult<WxAccountPool> result = wxAccountPoolService.queryWxAccountPoolForPage(request);
+        return result != null && CollectionUtils.isNotEmpty(result.getList());
+    }
+
+    private void addWechatLoginRecord(String wxid, String serverIp, Integer port, JSONObject data) {
+        // 创建新的登录记录
+        WechatLoginRecordSaveReqVO newRecord = new WechatLoginRecordSaveReqVO();
+        newRecord.setWxUnionId(wxid);
+        newRecord.setWxNo(data.getString("wxNum"));
+        newRecord.setNickname(data.getString("nick"));
+        newRecord.setIp(serverIp);
+        newRecord.setPort(port);
+        newRecord.setLoginTime(LocalDateTime.now());
+        newRecord.setIsOffline(false);
+        wechatLoginRecordService.createWechatLoginRecord(newRecord);
+        log.info("已创建微信ID{}的新登录记录", wxid);
+    }
+
+    private List<WechatLoginRecordDO> getExistingLoginRecord(String wxUnionId) {
+        return wechatLoginRecordService.getOnlineWechatAccountsByWxIdList(Collections.singletonList(wxUnionId));
+    }
+
+    /**
+     * 处理登出事件
+     */
+    private void handleLogout(String wxid, Integer port, String serverIp) {
+        log.info("处理微信登出事件: wxid={}, port={}, serverIp={}", wxid, port, serverIp);
+
+        // 查询登录记录
+        List<WechatLoginRecordDO> existingLoginRecord = getExistingLoginRecord(wxid);
+
+        // 如果存在记录，更新状态或删除
+        if (CollectionUtils.isNotEmpty(existingLoginRecord)) {
+            Optional<WechatLoginRecordDO> optionalRecord = existingLoginRecord.stream()
+                    .filter(record -> serverIp.equals(record.getIp()))
+                    .findFirst();
+            optionalRecord.ifPresent(record -> {
+                WechatLoginRecordSaveReqVO wechatLoginRecordSaveReqVO = new WechatLoginRecordSaveReqVO();
+                wechatLoginRecordSaveReqVO.setId(record.getId());
+                record.setIsOffline(YesOrNoEnum.YES.getStatus());
+                record.setDeleted(YesOrNoEnum.YES.getStatus());
+                wechatLoginRecordService.updateWechatLoginRecord(wechatLoginRecordSaveReqVO);
+                wechatLoginRecordService.deleteWechatLoginRecord(record.getId());
+            });
+            log.info("用户登出: 已将微信ID{}的登录记录标记为离线", wxid);
+        } else {
+            log.warn("未找到微信ID{}的登录记录，无法处理登出", wxid);
         }
     }
 
@@ -56,7 +263,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
         try {
             // 提取基础信息
-            String wxid = Objects.toString(callbackData.get("wxid"), "未知");
+            String wxid = Objects.toString(callbackData.get("wxid"), UNKNOWN);
             Map<String, Object> data = (Map<String, Object>) callbackData.get("data");
 
             if (data == null) {
@@ -84,7 +291,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
             }
 
             /// 设置wxid，确保VO对象中的wxid与回调的wxid一致
-            if (StringUtils.hasText(wxid) && !wxid.equals("未知")) {
+            if (!wxid.equals(UNKNOWN)) {
                 eventVo.setWxid(wxid);
             }
 
@@ -104,7 +311,6 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         }
     }
 
-
     /**
      * 登出后清理资源
      */
@@ -121,7 +327,6 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
             log.error("[cleanupAfterLogout][微信账号资源清理异常] wxid: {}", wxid, e);
         }
     }
-
 
     /**
      * 处理账号登出事件
@@ -224,5 +429,4 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         }
         return null;
     }
-
 }

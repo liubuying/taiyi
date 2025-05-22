@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunQrCode
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Throwables;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.GET;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.REDIS_PORT_KEY_PREFIX;
 import static cn.iocoder.yudao.module.system.util.babanceip.LoadBalancer.selectBalancedIp;
 
 
@@ -153,15 +155,15 @@ public class WeChatQueryController {
 
     private void putQrCodeCache(String balancedIp, QianXunResponse<QianXunQrCode> loginQrCode) {
         // 缓存二维码数据 和port 和pid数据
-        String key = RedisUtils.buildKey(balancedIp, "_", loginQrCode.getPort());
-        List<QianXunQrCode> qianXunQrCodes = new ArrayList<>();
+        String key = RedisUtils.buildKey(REDIS_PORT_KEY_PREFIX, "_", loginQrCode.getPort());
+        List<QianXunResponse<QianXunQrCode>> qianXunQrCodes = new ArrayList<>();
         if (RedisUtils.exists(key)) {
             String value = RedisUtils.getValue(key);
-            qianXunQrCodes = JSONArray.parseArray(value, QianXunQrCode.class);
+            qianXunQrCodes = JSON.parseObject(value, new TypeReference<List<QianXunResponse<QianXunQrCode>>>() {});
             if (CollectionUtils.isEmpty(qianXunQrCodes)) {
                 qianXunQrCodes = new ArrayList<>();
             }
-            qianXunQrCodes.add(loginQrCode.getResult());
+            qianXunQrCodes.add(loginQrCode);
         }
         RedisUtils.setValue(key, JSON.toJSONString(qianXunQrCodes), 60);
     }
