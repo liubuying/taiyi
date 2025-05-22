@@ -3,8 +3,9 @@ package cn.iocoder.yudao.module.system.controller.admin.wechat.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
-import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 微信用户登录记录新增/修改 Request VO")

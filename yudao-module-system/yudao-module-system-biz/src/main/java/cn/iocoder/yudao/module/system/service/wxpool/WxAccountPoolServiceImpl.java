@@ -139,7 +139,7 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
         }catch (Exception e){
             log.error("查询员工绑定账号池数据,params:{}",JSON.toJSONString(poolRequest), e);
         }
-         return List.of();
+         return null;
     }
 
 
