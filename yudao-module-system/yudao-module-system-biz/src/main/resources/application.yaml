@@ -193,6 +193,9 @@ yudao:
       - system_notify_template
       - system_
       - taiyi_domain_name
+      - taiyi_domain_wx_account_relation
+      - taiyi_wx_group_person_relation
+      - taiyi_users_wx_account_relation
     ignore-caches:
       - user_role_ids
       - permission_menu_ids

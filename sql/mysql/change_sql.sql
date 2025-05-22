@@ -1,3 +1,22 @@
+ALTER TABLE taiyi_db.taiyi_domain_wx_account_relation ADD deleted INT DEFAULT 0 NOT NULL COMMENT '是否删除';
+
+
+ALTER TABLE taiyi_db.taiyi_domain_name DROP KEY domain_name;
+
+
+ALTER TABLE taiyi_db.taiyi_domain_name MODIFY COLUMN operator_id bigint unsigned NULL COMMENT '操作人ID';
+
+
+ALTER TABLE taiyi_db.taiyi_domain_name MODIFY COLUMN company_id bigint unsigned NULL COMMENT '所属公司ID';
+
+
+ALTER TABLE taiyi_db.taiyi_domain_name CHANGE creatorId creator_id bigint NOT NULL COMMENT '创建人';
+
+ALTER TABLE taiyi_db.taiyi_domain_wx_account_relation ADD creator_id BIGINT NOT NULL COMMENT '创建人';
+
+
+
+
 ALTER TABLE taiyi_db.taiyi_domain_name CHANGE `desc` domain_desc text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '域名备注';
 
 ALTER TABLE taiyi_db.taiyi_domain_name ADD `domain` varchar(64) NOT NULL COMMENT '域名IP或者域名';

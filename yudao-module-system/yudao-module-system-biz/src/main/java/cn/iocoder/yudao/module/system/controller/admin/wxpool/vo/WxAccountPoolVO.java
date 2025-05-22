@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.wxpool.vo;
 
 import cn.iocoder.yudao.module.system.domain.enums.YesOrNoEnum;
 import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
+import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -46,5 +47,7 @@ public class WxAccountPoolVO implements Serializable {
      * 绑定员工
      */
     private UserInfo employeeUser;
+
+    private DomainName domainName;
 
 }

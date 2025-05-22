@@ -33,6 +33,7 @@ public class WxDomainUrlServiceImpl implements WxDomainUrlService{
         }
         DomainName domainName = new DomainName();
         BeanUtils.copyProperties(wxDomainUrlVO, domainName);
+        domainName.setDomainDesc(wxDomainUrlVO.getDesc());
         wxDomainUrlRepository.saveDomainUrl(domainName);
         return CommonResult.success(null);
     }

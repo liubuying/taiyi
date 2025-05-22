@@ -188,7 +188,7 @@ public class WxAccountPoolController {
             userInfo.setUserName(user.getUsername());
             userInfo.setOperationTime(new Date());
             wxAccountPoolVO.setOperator(userInfo);
-            wxAccountPoolService.bindDomainUrl(wxAccountPoolVO);
+            wxAccountPoolService.bindEmployee(wxAccountPoolVO);
             return CommonResult.success(true);
         } catch (Exception e) {
             log.info("查询微信池账号异常,param:{},e:{}",JSON.toJSONString(request), Throwables.getStackTraceAsString(e));
@@ -208,7 +208,7 @@ public class WxAccountPoolController {
             userInfo.setUserName(user.getUsername());
             userInfo.setOperationTime(new Date());
             wxAccountPoolVO.setOperator(userInfo);
-            wxAccountPoolService.unBindDomainUrl(wxAccountPoolVO);
+            wxAccountPoolService.unBindEmployee(wxAccountPoolVO);
             return CommonResult.success(true);
         } catch (Exception e) {
             log.info("查询微信池账号异常,param:{},e:{}",JSON.toJSONString(request), Throwables.getStackTraceAsString(e));

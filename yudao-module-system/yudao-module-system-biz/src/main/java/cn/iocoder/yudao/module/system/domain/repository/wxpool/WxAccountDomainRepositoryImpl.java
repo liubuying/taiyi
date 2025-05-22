@@ -132,8 +132,10 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
 
     @Override
     public Boolean bindDomainUrl(WxAccountPool wxAccountPool) {
-        if (StringUtils.isBlank(wxAccountPool.getUnionId())) {
-            log.info("绑定域名 wxId参数为空");
+        if (StringUtils.isBlank(wxAccountPool.getUnionId()) ||
+                 wxAccountPool.getOperator() == null ||
+                wxAccountPool.getDomainName() == null) {
+            log.info("绑定域名 wxId / domainName 参数为空");
             return false;
         }
         // 账号和域名绑定
@@ -158,7 +160,7 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
     public Boolean unBindDomainUrl(WxAccountPool wxAccountPool) {
         if (StringUtils.isBlank(wxAccountPool.getUnionId())
                 || wxAccountPool.getOperator() == null
-                || wxAccountPool.getEmployeeUser() == null) {
+                || wxAccountPool.getDomainName() == null) {
             log.info("绑定域名 wxId参数为空");
             return false;
         }
@@ -170,8 +172,12 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository{
             log.error("未查到绑定数据");
             throw new ServerException(ErrorCodeConstants.DATA_NOT_EXISTS);
         }
-        relationDO.setDeleted(YesOrNoEnum.YES.getStatus());
-        return domainWxAccountRelationMapper.updateById(relationDO) > 0;
+        relationDO.setStatus(YesOrNoEnum.YES.getStatus());
+        domainWxAccountRelationMapper.updateById(relationDO);
+        DomainWxAccountRelationDO deleteDO = new DomainWxAccountRelationDO();
+        deleteDO.setId(relationDO.getId());
+        deleteDO.setDeleted(YesOrNoEnum.YES.getStatus());
+        return domainWxAccountRelationMapper.deleteById(relationDO) > 0;
     }
 
     @Override

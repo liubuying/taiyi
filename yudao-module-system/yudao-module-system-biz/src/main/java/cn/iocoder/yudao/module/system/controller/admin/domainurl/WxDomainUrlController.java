@@ -5,11 +5,13 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
 import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.system.service.domainurll.WxDomainUrlService;
+import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.base.Throwables;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,9 @@ public class WxDomainUrlController {
 
     @Resource
     private WxDomainUrlService wxDomainUrlService;
+
+    @Resource
+    private AdminUserService userService;
 
     @GetMapping("/page")
     public CommonResult<PageResult<WxDomainUrlVO>> page(DomainNameRequest reqVO) {
@@ -53,6 +58,8 @@ public class WxDomainUrlController {
             UserInfo userInfo = new UserInfo();
             userInfo.setUserId(loginUserId);
             userInfo.setOperationTime(new Date());
+            AdminUserDO user = userService.getUser(loginUserId);
+
             if(wxDomainUrlVO.getId() != null){
                 wxDomainUrlVO.setOperator(userInfo);
             } else {
