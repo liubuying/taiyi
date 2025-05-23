@@ -21,6 +21,7 @@ public class SystemServerApplication {
         // 如果你碰到启动的问题，请认真阅读 https://cloud.iocoder.cn/quick-start/ 文章
 
         SpringApplication.run(SystemServerApplication.class, args);
+        System.out.println("启动成功");
 
         // 如果你碰到启动的问题，请认真阅读 https://cloud.iocoder.cn/quick-start/ 文章
         // 如果你碰到启动的问题，请认真阅读 https://cloud.iocoder.cn/quick-start/ 文章

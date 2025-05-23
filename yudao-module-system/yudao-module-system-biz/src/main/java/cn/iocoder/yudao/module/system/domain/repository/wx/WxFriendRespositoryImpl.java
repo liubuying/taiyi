@@ -42,16 +42,16 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
     @Override
     public CommonResult<PageResult<WxFriendVO>> queryFriendDataList(WxQueryDTO dto) {
         //1.查询redis中是否有数据
-        String redisKey = formatKey(dto.getWxId());//formatKey(accessToken);
-        String redisData = stringRedisTemplate.opsForValue().get(redisKey); //RedisUtils.getValue(redisKey);//
-        List<WxFriendVO>   wxredisList= JsonUtils.parseArray(redisData,WxFriendVO.class);
-        //有直接返回
-        if(wxredisList.size()>0){
-            PageResult pageResult=new PageResult();
-            pageResult.setList(wxredisList.stream().limit(dto.getPageSize()).collect(Collectors.toList()));
-            pageResult.setTotal(Long.getLong(String.valueOf(wxredisList.size())));
-            return CommonResult.success(pageResult);
-        }
+//        String redisKey = formatKey(dto.getWxId());//formatKey(accessToken);
+//        String redisData = stringRedisTemplate.opsForValue().get(redisKey); //RedisUtils.getValue(redisKey);//
+//        List<WxFriendVO>   wxredisList= JsonUtils.parseArray(redisData,WxFriendVO.class);
+//        //有直接返回
+//        if(wxredisList.size()>0){
+//            PageResult pageResult=new PageResult();
+//            pageResult.setList(wxredisList.stream().limit(dto.getPageSize()).collect(Collectors.toList()));
+//            pageResult.setTotal(Long.getLong(String.valueOf(wxredisList.size())));
+//            return CommonResult.success(pageResult);
+//        }
         // 标准计算公式 mysql偏移量
         int offset = (dto.getPageNo() - 1) * dto.getPageSize();
         List<WxFriendVO> wxList =wxFriendMapper.queryFriendDataList(dto.getNick(),dto.getWxId(),dto.getType(),dto.getTenantId(),offset,dto.getPageSize());
@@ -67,7 +67,7 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
             List<WxFriendVO> lists=getWxFriendList(dto.getWxId());
             PageResult pageResult=new PageResult();
             pageResult.setList(lists.stream().limit(dto.getPageSize()).collect(Collectors.toList()));
-            pageResult.setTotal(Long.getLong(String.valueOf(wxredisList.size())));
+            pageResult.setTotal(Long.getLong(String.valueOf(lists.size())));
             return CommonResult.success(pageResult);
         }
         PageResult pageResult=new PageResult();
@@ -154,6 +154,20 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
         }
 
     }
+
+    @Override
+    public void deleteFriend(String toWxId) {
+     int i=   wxFriendMapper.deleteFriend(toWxId);
+        if (i > 0) {
+            log.info("成功删除 {} 条好友记录", toWxId);
+        } else {
+            log.warn("未找到 wx_id={} 的好友记录", toWxId);
+        }
+    }
+
+
+
+
 
     List<WxFriendDO> getWxFriendGroupFromQx(String wxid, Integer type){
         //todo  1.调用千寻接口（好友、群聊）

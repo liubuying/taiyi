@@ -67,6 +67,7 @@ public interface ErrorCodeConstants {
     ErrorCode DEMO03_STUDENT_NOT_EXISTS = new ErrorCode(1_001_201_007, "学生不存在");
     ErrorCode DEMO03_GRADE_NOT_EXISTS = new ErrorCode(1_001_201_008, "学生班级不存在");
     ErrorCode DEMO03_GRADE_EXISTS = new ErrorCode(1_001_201_009, "学生班级已存在");
+    ErrorCode DEMO03_FRINEND_FALL = new ErrorCode(1_001_201_010, "删除好友失败");
 
     // ========== 千寻框架 1-001-999-001 ==========
     ErrorCode QIANXUN_API_RESULT_ERROR = new ErrorCode(1_001_999_001, "千寻框架接口响应异常");
