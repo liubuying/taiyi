@@ -15,9 +15,9 @@ import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
 import cn.iocoder.yudao.module.system.service.domainurll.WxDomainUrlService;
 import cn.iocoder.yudao.module.system.service.wx.WechatLoginRecordService;
+import cn.iocoder.yudao.module.system.service.wx.WxFriendService;
 import cn.iocoder.yudao.module.system.service.wxpool.WxAccountPoolService;
-import cn.iocoder.yudao.module.system.util.cache.RedisUtils;
-import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunQrCode;
+import cn.iocoder.yudao.module.system.util.cache.RedisWrapper;
 import cn.iocoder.yudao.module.system.wrapper.qianxun.qianXunModel.QianXunResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -29,6 +29,8 @@ import java.util.*;
 import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -36,6 +38,7 @@ import javax.annotation.Resource;
 import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.REDIS_PORT_KEY_PREFIX;
 
 @Slf4j
+@Service
 public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
     private static final String UNKNOWN = "未知";
@@ -49,6 +52,12 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
     @Resource
     private WxDomainUrlService wxDomainUrlService;
+
+    @Resource
+    private RedisWrapper redisWrapper;
+
+    @Resource
+    private WxFriendService wxFriendService;
 
     /**
      * 处理通用回调
@@ -78,7 +87,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
                 // 获取Redis中的缓存数据
                 String cacheKey = REDIS_PORT_KEY_PREFIX + port;
-                String cacheData = RedisUtils.getValue(cacheKey);
+                String cacheData = redisWrapper.getValue(cacheKey);
 
                 if (!StringUtils.hasText(cacheData)) {
                     log.warn("未找到端口{}的缓存数据", port);
@@ -113,7 +122,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
                 } finally {
                     // 清除Redis缓存
                     if (handledSuccessfully) {
-                        RedisUtils.delValue(cacheKey);
+                        redisWrapper.delValue(cacheKey);
                         log.info("已清除端口{}的缓存数据", port);
                     }
                 }
@@ -129,6 +138,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
     /**
      * 处理登录事件
      */
+    @Transactional(rollbackFor = Exception.class)
     private void handleLogin(String wxid, Integer port, String serverIp, JSONObject data) {
         log.info("处理微信登录事件: wxid={}, port={}, serverIp={}", wxid, port, serverIp);
 
@@ -176,6 +186,9 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         bindWxAccountPoolVO.setCreator(DEFAULT_USER_INFO);
         wxAccountPoolService.bindDomainUrl(bindWxAccountPoolVO);
         log.info("已绑定微信ID{}与IP{}", wxid, serverIp);
+
+        // 同步好友和群信息
+        wxFriendService.refreshWxFriendFromQianxun(wxid);
     }
 
     private void addAccountPool(String wxid, JSONObject data) {
