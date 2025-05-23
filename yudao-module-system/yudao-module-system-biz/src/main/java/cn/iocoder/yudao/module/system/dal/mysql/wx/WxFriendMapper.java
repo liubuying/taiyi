@@ -25,7 +25,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
             "  </if>" +
             "  <if test='wxId!= null and wxId.trim() != \"\"'>" +
 
-            "    AND wx_persion_id = #{wxId}" +
+            "    AND wx_person_id = #{wxId}" +
             "  </if>" +
             "  <if test='type != null and type.trim() != \"\"'>" +
             "    AND type = #{type}" +
@@ -49,7 +49,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
             "  </if>" +
             "  <if test='wxId!= null and wxId.trim() != \"\"'>" +
 
-            "    AND wx_persion_id = #{wxId}" +
+            "    AND wx_person_id = #{wxId}" +
             "  </if>" +
             "  <if test='type != null and type.trim() != \"\"'>" +
             "    AND type = #{type}" +
