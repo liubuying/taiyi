@@ -36,6 +36,9 @@ public  class WxSendServiceImpl implements WxSendService {
          ///to do 三方发消息
         log.info("开始发送消息");
         WxSendDO wxSendDO1=  sendMessage(wxSendDO);
+        wxSendDO.setSendStatus(1);
+        wxSendDO.setMsgType(1);
+        wxSendDO.setSendTime(new Date());
         //发送
         wxSendMapper.insert(wxSendDO1);
         return CommonResult.success("成功");
@@ -75,12 +78,12 @@ public  class WxSendServiceImpl implements WxSendService {
         DateRangeValidator.validate(startTime, endTime);
         List<WxSendDO> wxSendDOList = wxSendMapper.selectList(
                 new LambdaQueryWrapper<WxSendDO>()
-                        .ge(WxSendDO::getSendTime, startTime)  // >= 开始时间
-                        .eq(WxSendDO::getFromType, endTime)  // >= 开始时间
-                        .eq(WxSendDO::getFromUser, dto.getWxId())  // >= 微信id
-                        .eq(WxSendDO::getMsgType, dto.getMsgType())  // >= 消息类型
-                        .le(WxSendDO::getSendStatus, dto.getSendStatus())    // 消息状态
-                        .orderByDesc(WxSendDO::getSendTime)    // 按时间倒序
+                        .ge(WxSendDO::getSendTime, startTime)  // >= start time
+                        .le(WxSendDO::getSendTime, endTime)    // <= end time
+                        .eq(WxSendDO::getFromUser, dto.getWxId())  // = wechat ID
+                        .eq(WxSendDO::getMsgType, dto.getMsgType())  // = message type
+                        .le(WxSendDO::getSendStatus, dto.getSendStatus())  // <= send status
+                        .orderByDesc(WxSendDO::getSendTime)  // order by send time descending
         );
         return CommonResult.success(BeanUtils.toBean(wxSendDOList,WxMessageVo.class));
     }
