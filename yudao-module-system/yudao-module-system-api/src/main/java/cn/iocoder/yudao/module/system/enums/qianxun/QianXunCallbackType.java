@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.enums.qianxun;
 /**
  * 回调事件
  */
-public class QianXunCallbackTypeEnum {
+public interface QianXunCallbackType {
     /**
      * 注入成功（10000）
      */

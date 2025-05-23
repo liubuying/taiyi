@@ -4,12 +4,15 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.controller.admin.company.vo.company.CompanyPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.domainurl.vo.WxDomainUrlVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.company.CompanyDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.domain.model.base.UserInfo;
 import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 import cn.iocoder.yudao.module.system.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.system.service.company.CompanyService;
 import cn.iocoder.yudao.module.system.service.domainurll.WxDomainUrlService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.google.common.base.Throwables;
@@ -35,6 +38,9 @@ public class WxDomainUrlController {
 
     @Resource
     private AdminUserService userService;
+
+    @Resource
+    private CompanyService companyService;
 
     @GetMapping("/page")
     public CommonResult<PageResult<WxDomainUrlVO>> page(DomainNameRequest reqVO) {
@@ -63,6 +69,20 @@ public class WxDomainUrlController {
             if(wxDomainUrlVO.getId() != null){
                 wxDomainUrlVO.setOperator(userInfo);
             } else {
+                Long tenantId = user.getTenantId();
+
+                CompanyPageReqVO reqVO = new CompanyPageReqVO();
+                reqVO.setTenantId(tenantId);
+                PageResult<CompanyDO> companyPage = companyService.getCompanyPage(reqVO);
+                if (companyPage == null) {
+                    return CommonResult.error(ErrorCodeConstants.COMPANY_NOT_EXISTS);
+                }
+
+                List<CompanyDO> companyList = companyPage.getList();
+                if (companyList.isEmpty()) {
+                    return CommonResult.error(ErrorCodeConstants.COMPANY_NOT_EXISTS);
+                }
+                Long companyId = companyList.get(0).getId();
                 wxDomainUrlVO.setCreator(userInfo);
             }
             wxDomainUrlService.saveDomainUrl(wxDomainUrlVO);

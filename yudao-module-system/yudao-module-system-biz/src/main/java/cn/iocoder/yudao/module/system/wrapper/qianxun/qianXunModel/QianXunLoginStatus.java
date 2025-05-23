@@ -28,6 +28,7 @@ public class QianXunLoginStatus {
      */
     private String wxid;
 
+
     /**
      * 端口号
      */
@@ -78,4 +79,6 @@ public class QianXunLoginStatus {
      * 昵称
      */
     private String nick;
+    
+    private String domain;
 }

@@ -196,6 +196,7 @@ yudao:
       - taiyi_domain_wx_account_relation
       - taiyi_wx_group_person_relation
       - taiyi_users_wx_account_relation
+      - taiyi_wechat_login_record
     ignore-caches:
       - user_role_ids
       - permission_menu_ids

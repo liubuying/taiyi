@@ -67,7 +67,16 @@ public interface QXunWrapper {
      * @param wxId 微信ID
      * @return 响应对象，包含个人信息
      */
-     QianXunResponse<QianXunInfo> getSelfInfo(String ip, String wxId);
+     QianXunResponse<QianXunInfoSelf> getSelfInfo(String ip, String wxId);
+
+    /**
+     * 获取个人信息
+     *
+     * @param ip 服务器域名
+     * @param wxId 微信ID
+     * @return 响应对象，包含个人信息
+     */
+    QianXunResponse<QianXunInfoSelf> getSelfInfo(String ip, String wxId,String port);
 
     /**
      * 获取好友列表

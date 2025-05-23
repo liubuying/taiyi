@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.system.controller.admin.callback.impl;
 
+import cn.iocoder.yudao.module.system.controller.admin.callback.request.CallBackReq;
+import org.apache.poi.ss.formula.functions.T;
+
 import java.util.Map;
 
 /**
@@ -10,9 +13,9 @@ public interface QianXunCallbackService {
     /**
      * 处理通用回调
      *
-     * @param requestBody 请求体JSON内容
+     * @param request 请求体JSON内容
      */
-    void handleQianXunCallback(String requestBody);
+    void handleQianXunCallback(CallBackReq request);
 
     /**
      * 处理账号变动事件(10014)

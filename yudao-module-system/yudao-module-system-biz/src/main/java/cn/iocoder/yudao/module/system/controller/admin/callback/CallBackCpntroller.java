@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.system.controller.admin.callback;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.callback.impl.QianXunCallbackService;
+import cn.iocoder.yudao.module.system.controller.admin.callback.request.CallBackReq;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -54,12 +57,13 @@ public class CallBackCpntroller {
     @Operation(summary = "接收千寻微信框架的回调事件")
     public CommonResult<Boolean> receiveCallback(@RequestBody String callbackData) {
         // 记录调试日志
-        if (log.isDebugEnabled()) {
-            log.debug("[receiveCallback][收到回调请求] 数据: {}", callbackData);
-        }
 
+            log.info("[receiveCallback][收到回调请求] 数据: {}", callbackData);
+
+        CallBackReq callBackReq = JSON.parseObject(callbackData, new TypeReference<CallBackReq>() {
+        });
         // 处理回调事件
-        qianXunCallbackService.handleQianXunCallback(callbackData);
+        qianXunCallbackService.handleQianXunCallback(callBackReq);
 
         // 返回成功
         return success(true);

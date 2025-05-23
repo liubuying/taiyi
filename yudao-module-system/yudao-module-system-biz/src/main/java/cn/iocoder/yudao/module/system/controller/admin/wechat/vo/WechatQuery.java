@@ -12,7 +12,7 @@ public class WechatQuery implements Serializable {
      */
     private String wxUnionId;
 
-    private String wxOpenId;
+    private String wxNo;
 
     private String wxLoginStaus;
 
@@ -23,4 +23,6 @@ public class WechatQuery implements Serializable {
     private String port;
 
     private String pid;
+
+    private String eventId;
 }

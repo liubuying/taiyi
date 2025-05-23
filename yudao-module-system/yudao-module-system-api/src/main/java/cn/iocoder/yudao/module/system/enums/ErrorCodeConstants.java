@@ -190,6 +190,7 @@ public interface ErrorCodeConstants {
 
     ErrorCode WECHAT_LOGIN_QRCODE_ERROR = new ErrorCode(1_003_001_005, "获取登录二维码失败，请稍后再试");
     ErrorCode SYSTEM_ERROR = new ErrorCode(1_003_001_500, "系统异常，请稍后再试");
-    ErrorCode DOMAIN_NOT_FOUND = new ErrorCode(1_003_001_006, "");
+    ErrorCode DOMAIN_NOT_FOUND = new ErrorCode(1_003_001_006, "域名未找到");
     ErrorCode IP_SELECTION_FAILED = new ErrorCode(1_003_001_007, "分配IP失败");
+    ErrorCode QUERY_LOGIN_WECHAT_INFO_ERROR = new ErrorCode(1_003_001_008, "查询千寻登录账号信息异常");
 }

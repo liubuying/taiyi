@@ -1,3 +1,21 @@
+ALTER TABLE taiyi_db.taiyi_company ADD creator_id BIGINT NOT NULL COMMENT '创建人信息';
+ALTER TABLE taiyi_db.taiyi_company ADD operator_id BIGINT NULL COMMENT '操作人';
+
+
+
+ALTER TABLE taiyi_db.taiyi_company ADD tenant_id BIGINT NOT NULL COMMENT '租户入驻信息';
+
+
+
+ALTER TABLE taiyi_db.taiyi_company ADD deleted INT DEFAULT 0 NULL COMMENT '删除';
+
+
+
+ALTER TABLE taiyi_db.taiyi_legal_person ADD deleted INT DEFAULT 0 NULL COMMENT '是否删除';
+
+
+
+
 ALTER TABLE taiyi_db.taiyi_wechat_login_record ADD deleted INT DEFAULT 0 NULL COMMENT '删除 0 未删除 1删除';
 
 

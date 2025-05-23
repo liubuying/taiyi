@@ -81,10 +81,10 @@ public class QXunWrapperImpl implements QXunWrapper {
             response.setCode(code);
             response.setMsg(msg);
             response.setTimestamp(timestamp);
-            response.setWxid(rootNode.path("wxid").asText());
+           /* response.setWxid(rootNode.path("wxid").asText());
             response.setPort(rootNode.path("port").asText());
             response.setPid(rootNode.path("pid").asText());
-            response.setFlag(rootNode.path("flag").asText());
+            response.setFlag(rootNode.path("flag").asText());*/
 
             // 如果有data字段且状态码为200，解析data
             if (code == 200 && rootNode.has("result")) {
@@ -104,8 +104,6 @@ public class QXunWrapperImpl implements QXunWrapper {
                 if (rootNode.has("port")) fullResult.put("port", rootNode.path("port").asInt());
                 if (rootNode.has("pid")) fullResult.put("pid", rootNode.path("pid").asInt());
                 if (rootNode.has("flag")) fullResult.put("flag", rootNode.path("flag").asText());
-                if (rootNode.has("timestamp"))
-                    fullResult.put("startTimeStamp", rootNode.path("timestamp").asText());
 
                 // 使用map创建QianXunLoginStatus对象
                 QianXunLoginStatus loginStatus = JsonUtils.parseObject(JsonUtils.toJsonString(fullResult), QianXunLoginStatus.class);
@@ -196,7 +194,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @return 个人信息
      */
     @Override
-    public QianXunResponse<QianXunInfo> getSelfInfo(String ip, String wxid) {
+    public QianXunResponse<QianXunInfoSelf> getSelfInfo(String ip, String wxid) {
         return sendRequest(
                 ip,
                 QIANXUN_REQUEST_URL_PATH,
@@ -206,7 +204,22 @@ public class QXunWrapperImpl implements QXunWrapper {
                     data.put("type", "2");
                     return data;
                 },
-                QianXunInfo.class
+                QianXunInfoSelf.class
+        );
+    }
+
+    @Override
+    public QianXunResponse<QianXunInfoSelf> getSelfInfo(String ip, String wxId, String port) {
+        return sendRequest(
+                ip+":"+port,
+                WECHAT_REQUEST_URL_PATH,
+                wxId,
+                QianXunApiTypeEnum.GET_SELF_INFO,
+                data -> {
+                    data.put("type", "2");
+                    return data;
+                },
+                QianXunInfoSelf.class
         );
     }
 

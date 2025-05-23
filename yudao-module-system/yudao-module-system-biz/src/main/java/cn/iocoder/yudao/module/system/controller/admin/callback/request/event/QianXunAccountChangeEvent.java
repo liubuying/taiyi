@@ -1,19 +1,18 @@
-package cn.iocoder.yudao.module.system.controller.admin.callback.vo.event;
+package cn.iocoder.yudao.module.system.controller.admin.callback.request.event;
 
-import cn.iocoder.yudao.module.system.controller.admin.callback.vo.BaseEventVo;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 
 @Data
 @Accessors(chain = true)
-public class QianXunAccountChangeEventVo extends BaseEventVo {
-    /**
-     * 事件类型
-     * 1: 上线
-     * 0: 下线
-     */
-    private String type;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class QianXunAccountChangeEvent extends BaseEvent {
+
 
     /**
      * 微信号

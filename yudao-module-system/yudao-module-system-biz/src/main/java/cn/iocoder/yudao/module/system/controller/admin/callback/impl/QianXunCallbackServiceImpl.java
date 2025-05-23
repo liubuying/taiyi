@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.system.controller.admin.callback.impl;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.system.controller.admin.callback.vo.event.QianXunAccountChangeEventVo;
+import cn.iocoder.yudao.module.system.controller.admin.callback.request.CallBackReq;
+import cn.iocoder.yudao.module.system.controller.admin.callback.request.event.QianXunAccountChangeEvent;
 import cn.iocoder.yudao.module.system.controller.admin.wechat.vo.WechatLoginRecordSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.wxpool.vo.WxAccountPoolVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.wx.WechatLoginRecordDO;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.module.system.domain.model.domainurl.DomainName;
 import cn.iocoder.yudao.module.system.domain.model.wxpool.WxAccountPool;
 import cn.iocoder.yudao.module.system.domain.request.DomainNameRequest;
 import cn.iocoder.yudao.module.system.domain.request.WxAccountPoolRequest;
+import cn.iocoder.yudao.module.system.enums.qianxun.QianXunCallbackType;
 import cn.iocoder.yudao.module.system.service.domainurll.WxDomainUrlService;
 import cn.iocoder.yudao.module.system.service.wx.WechatLoginRecordService;
 import cn.iocoder.yudao.module.system.service.wx.WxFriendService;
@@ -65,67 +67,24 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
      * @param requestBody 请求体JSON内容
      */
     @Override
-    public void handleQianXunCallback(String requestBody) {
+    public void handleQianXunCallback(CallBackReq request) {
         try {
-            log.info("收到千寻回调数据: {}", requestBody);
+            log.info("收到千寻回调数据: {}", request);
 
             // 解析回调JSON数据
-            JSONObject jsonObj = JSONObject.parseObject(requestBody);
+            /*SONObject jsonObj = JSONObject.parseObject(requestBody);
             Integer event = jsonObj.getInteger("event");
             String wxid = jsonObj.getString("wxid");
-            JSONObject data = jsonObj.getJSONObject("data");
+            JSONObject data = jsonObj.getJSONObject("data");*/
+            String event = request.getEvent();
+            String wxid = request.getWxid();
+            Object data = request.getData();
 
-            if (event == 10014) { // 登录状态变更事件
-                Integer type = data.getInteger("type");
-                Integer port = data.getInteger("port");
-
-                // 校验端口范围
-                if (port == null || port <= 0 || port > 65535) {
-                    log.warn("无效的端口号: {}", port);
-                    return;
+            if (QianXunCallbackType.wxidChange.equals(event)) { // 登录状态变更事件
+                if(data instanceof QianXunAccountChangeEvent){
+                   changeAccountEvent(request);
                 }
 
-                // 获取Redis中的缓存数据
-                String cacheKey = REDIS_PORT_KEY_PREFIX + port;
-                String cacheData = redisWrapper.getValue(cacheKey);
-
-                if (!StringUtils.hasText(cacheData)) {
-                    log.warn("未找到端口{}的缓存数据", port);
-                    return;
-                }
-
-                List<QianXunResponse<?>> qrCodeList;
-                try {
-                    qrCodeList = JSON.parseObject(cacheData, new TypeReference<List<QianXunResponse<?>>>(){});
-                } catch (Exception e) {
-                    log.warn("端口{}的缓存数据解析失败", port, e);
-                    return;
-                }
-
-                if (qrCodeList == null || qrCodeList.isEmpty()) {
-                    log.warn("端口{}的缓存数据解析失败", port);
-                    return;
-                }
-
-                // 获取IP地址（从缓存数据中提取）
-                String serverIp = qrCodeList.get(0).getDomain();
-
-                boolean handledSuccessfully = false;
-                try {
-                    if (type == 1) { // 登录事件
-                        handleLogin(wxid, port, serverIp, data);
-                        handledSuccessfully = true;
-                    } else if (type == 0) { // 登出事件
-                        handleLogout(wxid, port, serverIp);
-                        handledSuccessfully = true;
-                    }
-                } finally {
-                    // 清除Redis缓存
-                    if (handledSuccessfully) {
-                        redisWrapper.delValue(cacheKey);
-                        log.info("已清除端口{}的缓存数据", port);
-                    }
-                }
             }
         } catch (IllegalArgumentException e) {
             log.warn("处理千寻回调参数异常", e);
@@ -135,11 +94,67 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         }
     }
 
+    private void changeAccountEvent(CallBackReq request) {
+        String event = request.getEvent();
+        String wxid = request.getWxid();
+        QianXunAccountChangeEvent data = (QianXunAccountChangeEvent)request.getData();
+        String type = data.getType();
+        Integer port = data.getPort();
+
+        // 校验端口范围
+        if (port == null || port <= 0 || port > 65535) {
+            log.warn("无效的端口号: {}", port);
+            return;
+        }
+
+        // 获取Redis中的缓存数据
+        String cacheKey = redisWrapper.buildKey(REDIS_PORT_KEY_PREFIX, "_", port.toString());
+        String cacheData = redisWrapper.getValue(cacheKey);
+
+        if (!StringUtils.hasText(cacheData)) {
+            log.warn("未找到端口{}的缓存数据", port);
+            return;
+        }
+
+        List<QianXunResponse<?>> qrCodeList;
+        try {
+            qrCodeList = JSON.parseObject(cacheData, new TypeReference<List<QianXunResponse<?>>>(){});
+        } catch (Exception e) {
+            log.warn("端口{}的缓存数据解析失败", port, e);
+            return;
+        }
+
+        if (qrCodeList == null || qrCodeList.isEmpty()) {
+            log.warn("端口{}的缓存数据解析失败", port);
+            return;
+        }
+
+        // 获取IP地址（从缓存数据中提取）
+        String serverIp = qrCodeList.get(0).getDomain();
+
+        boolean handledSuccessfully = false;
+        try {
+            if (YesOrNoEnum.YES.getStatus().equals(type)) { // 登录事件
+                handleLogin(wxid, port, serverIp, data);
+                handledSuccessfully = true;
+            } else { // 登出事件
+                handleLogout(wxid, port, serverIp);
+                handledSuccessfully = true;
+            }
+        } finally {
+            // 清除Redis缓存
+            if (handledSuccessfully) {
+                redisWrapper.delValue(cacheKey);
+                log.info("已清除端口{}的缓存数据", port);
+            }
+        }
+    }
+
     /**
      * 处理登录事件
      */
     @Transactional(rollbackFor = Exception.class)
-    private void handleLogin(String wxid, Integer port, String serverIp, JSONObject data) {
+    private void handleLogin(String wxid, Integer port, String serverIp, QianXunAccountChangeEvent data) {
         log.info("处理微信登录事件: wxid={}, port={}, serverIp={}", wxid, port, serverIp);
 
         // 查询域名数据
@@ -147,7 +162,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         domainNameRequest.setDomain(serverIp);
         List<DomainName> domainNames = wxDomainUrlService.queryAllDomainUrl(domainNameRequest);
         if(CollectionUtils.isEmpty(domainNames)){
-            log.info("handleLogin 查询的域名不存在,param:{}",data.toJSONString());
+            log.info("handleLogin 查询的域名不存在,param:{}",JSON.toJSONString(data));
             return;
         }
 
@@ -191,16 +206,16 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         wxFriendService.refreshWxFriendFromQianxun(wxid);
     }
 
-    private void addAccountPool(String wxid, JSONObject data) {
+    private void addAccountPool(String wxid, QianXunAccountChangeEvent data) {
         // 保存到微信公共池
         WxAccountPoolVO accountPool = new WxAccountPoolVO();
         accountPool.setDeleted(YesOrNoEnum.NO.getStatus());
         accountPool.setAccountType("wechat");
         accountPool.setUnionId(wxid);
-        accountPool.setNickName(data.getString("nick"));
-        accountPool.setAvatar(data.getString("avatarUrl"));
-        accountPool.setPhone(data.getString("phone"));
-        accountPool.setEmail(data.getString("email"));
+        accountPool.setNickName(data.getNick());
+        accountPool.setAvatar(data.getAvatarUrl());
+        accountPool.setPhone(data.getPhone());
+        accountPool.setEmail(data.getEmail());
         accountPool.setIsExpired(YesOrNoEnum.NO); // 未过期
         accountPool.setCreator(DEFAULT_USER_INFO); // 根据业务设置正确的操作员ID
 
@@ -215,12 +230,12 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         return result != null && CollectionUtils.isNotEmpty(result.getList());
     }
 
-    private void addWechatLoginRecord(String wxid, String serverIp, Integer port, JSONObject data) {
+    private void addWechatLoginRecord(String wxid, String serverIp, Integer port, QianXunAccountChangeEvent data) {
         // 创建新的登录记录
         WechatLoginRecordSaveReqVO newRecord = new WechatLoginRecordSaveReqVO();
         newRecord.setWxUnionId(wxid);
-        newRecord.setWxNo(data.getString("wxNum"));
-        newRecord.setNickname(data.getString("nick"));
+        newRecord.setWxNo(data.getWxNum());
+        newRecord.setNickname(data.getNick());
         newRecord.setIp(serverIp);
         newRecord.setPort(port);
         newRecord.setLoginTime(LocalDateTime.now());
@@ -288,11 +303,11 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
             Integer type = getIntValue(data, "type");
 
             // 使用ObjectMapper将data转换为VO对象
-            QianXunAccountChangeEventVo eventVo;
+            QianXunAccountChangeEvent eventVo;
             try {
                 // 先将data转换为JSON字符串，再解析为VO对象
                 String dataJson = JsonUtils.toJsonString(data);
-                eventVo = JsonUtils.parseObject(dataJson, QianXunAccountChangeEventVo.class);
+                eventVo = JsonUtils.parseObject(dataJson, QianXunAccountChangeEvent.class);
             } catch (Exception e) {
                 log.error("[handleAccountChange][数据转换为VO异常] wxid: {}", wxid, e);
                 return;
@@ -347,7 +362,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
      * @param wxid 微信ID
      * @param eventVo 账号变动事件VO
      */
-    private void handleAccountLogout(String wxid, QianXunAccountChangeEventVo eventVo) {
+    private void handleAccountLogout(String wxid, QianXunAccountChangeEvent eventVo) {
         try {
             // TODO: 更新微信账号状态
             // wechatAccountService.updateStatus(wxid, false);
@@ -392,7 +407,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
      * @param wxid 微信ID
      * @param eventVo 账号变动事件VO
      */
-    private void handleAccountLogin(String wxid, QianXunAccountChangeEventVo eventVo) {
+    private void handleAccountLogin(String wxid, QianXunAccountChangeEvent eventVo) {
         try {
             log.info("[handleAccountLogin][微信账号登录详情] wxid: {}, 昵称: {}, 地区: {}{}{}",
                     wxid, eventVo.getNick(),

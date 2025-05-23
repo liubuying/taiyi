@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.controller.admin.wecom.token.request.JsApiInfoRequest;
 import cn.iocoder.yudao.module.system.controller.admin.wecom.token.vo.JsApiInfoVO;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
-import cn.iocoder.yudao.module.system.util.cache.RedisUtils;
+import cn.iocoder.yudao.module.system.util.cache.RedisWrapper;
 import cn.iocoder.yudao.module.system.util.encryption.Sha1Utils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 @Tag(name = "管理后台 - 用户")
 @RestController
@@ -26,6 +28,9 @@ public class WecomController {
     private static final String SECRET = "fU3zd_ULx5HOw5ETKBQuXnfP35QeoPOH5ZriBHf3CFE";
     private static final String agentId = "1000002";
 
+    @Resource
+    private RedisWrapper redisWrapper;
+
     /**
      * 获取微信企业号 access_token
      *
@@ -36,14 +41,14 @@ public class WecomController {
     public CommonResult<JsApiInfoVO> getJsApiInfo(@RequestBody JsApiInfoRequest request) {
         try {
             log.info("corpId:{},agentId:{}", CORP_ID, agentId);
-            String jsapiTicketKey = RedisUtils.buildKey(RedisKeyConstants.JSAPI_TICKET_PREFIX, RedisKeyConstants.DEFAULT_PREFIX, CORP_ID, agentId);
+            String jsapiTicketKey = redisWrapper.buildKey(RedisKeyConstants.JSAPI_TICKET_PREFIX, RedisKeyConstants.DEFAULT_PREFIX, CORP_ID, agentId);
             // 获取 access_token
 
-            boolean existsJsapiTicket = RedisUtils.exists(jsapiTicketKey);
+            boolean existsJsapiTicket = redisWrapper.exists(jsapiTicketKey);
             if (existsJsapiTicket) {
                 // 调用zhenli 接口获取 access_token和jsapi_ticket
             }
-            String jsApiTicketValue = RedisUtils.getValue(jsapiTicketKey);
+            String jsApiTicketValue = redisWrapper.getValue(jsapiTicketKey);
             Assert.notNull(jsApiTicketValue, "jsapi_ticket 不能为空");
 
             // 获取 jsapi_ticket

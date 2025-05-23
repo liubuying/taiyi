@@ -10,4 +10,6 @@ public class QianXunInfoSelf extends QianXunInfo {
     private String phone;
     private String email;
     private String qq;
+     // 事件回调使用 类型
+    private String type;
 }

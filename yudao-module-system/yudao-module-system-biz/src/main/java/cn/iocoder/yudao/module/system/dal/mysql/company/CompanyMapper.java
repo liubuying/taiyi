@@ -31,7 +31,7 @@ public interface CompanyMapper extends BaseMapperX<CompanyDO> {
                 .betweenIfPresent(CompanyDO::getEntryDate, reqVO.getEntryDate())
                 .betweenIfPresent(CompanyDO::getExitDate, reqVO.getExitDate())
                 .eqIfPresent(CompanyDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(CompanyDO::getCreateTime, reqVO.getCreateTime())
+                .betweenIfPresent(CompanyDO::getGmtCreate, reqVO.getCreateTime())
                 .orderByDesc(CompanyDO::getId));
     }
 

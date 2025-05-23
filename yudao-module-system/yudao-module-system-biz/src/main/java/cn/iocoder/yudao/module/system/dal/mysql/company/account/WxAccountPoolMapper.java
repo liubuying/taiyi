@@ -28,8 +28,7 @@ public interface WxAccountPoolMapper extends BaseMapperX<WxAccountPoolDO> {
                 .eqIfPresent(WxAccountPoolDO::getOperatorId, request.getOperatorId())
                 .eqIfPresent(WxAccountPoolDO::getIsExpired, request.getIsExpired())
                 .eqIfPresent(WxAccountPoolDO::getDeleted, 0)
-                .isNotNull(CollectionUtils.isNotEmpty(request.getWxUnionIdList()), WxAccountPoolDO::getUnionId)
-                .in(WxAccountPoolDO::getUnionId, request.getWxUnionIdList())
+                .in(CollectionUtils.isNotEmpty(request.getWxUnionIdList()),WxAccountPoolDO::getUnionId, request.getWxUnionIdList())
                 .orderByDesc(WxAccountPoolDO::getId));
     }
 

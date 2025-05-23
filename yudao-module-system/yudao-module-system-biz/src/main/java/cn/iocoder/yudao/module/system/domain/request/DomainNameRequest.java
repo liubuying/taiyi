@@ -27,9 +27,11 @@ public class DomainNameRequest extends PageParam  implements Serializable {
 
     private String domainType;
 
-    private String domainStatus;
+    private Integer domainStatus;
 
     private String companyId;
+
+    private Integer deleted;
 
 
 }

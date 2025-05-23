@@ -1,30 +1,34 @@
 package cn.iocoder.yudao.module.system.util.cache;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 
-public class RedisUtils {
+@Component
+public class RedisWrapper {
 
-    private static StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private  StringRedisTemplate stringRedisTemplate ;
 
     /**
      * 获取redis key
      */
-    public static String getValue(String key) {
+    public  String getValue(String key) {
         return stringRedisTemplate.opsForValue().get(key);
     }
 
 
-    public static void setValue(String key, String value) {
+    public  void setValue(String key, String value) {
         stringRedisTemplate.opsForValue().set(key, value);
     }
 
 
-    public static void setValue(String key, String value, long timeout) {
+    public  void setValue(String key, String value, long timeout) {
         stringRedisTemplate.opsForValue().set(key, value, timeout);
     }
 
 
-    public static void delValue(String key) {
+    public  void delValue(String key) {
         stringRedisTemplate.delete(key);
     }
 
@@ -33,7 +37,7 @@ public class RedisUtils {
      *
      * @param stringRedisTemplate
      */
-    public static boolean exists(String key) {
+    public  boolean exists(String key) {
         return stringRedisTemplate.hasKey(key);
     }
 
@@ -42,17 +46,14 @@ public class RedisUtils {
      *
      * @param stringRedisTemplate
      */
-    public static boolean isExpired(String key) {
+    public  boolean isExpired(String key) {
         return stringRedisTemplate.getExpire(key) == null;
     }
 
 
-    public static void setRedisTemplate(StringRedisTemplate stringRedisTemplate) {
-        RedisUtils.stringRedisTemplate = stringRedisTemplate;
-    }
 
 
-    public static String buildKey(String... s) {
+    public  String buildKey(String... s) {
         StringBuffer keyBuffer = new StringBuffer();
         for (String str : s) {
             keyBuffer.append(str);

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.callback.vo.event;
+package cn.iocoder.yudao.module.system.controller.admin.callback.request.event;
 
 import lombok.Data;
 
