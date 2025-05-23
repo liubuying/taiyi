@@ -54,16 +54,74 @@ public class QXunWrapperImpl implements QXunWrapper {
      * @return 响应对象，包含登录状态
      */
     @Override
-    public  QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, String prot){
-        ip = ip + ":" + prot;
-        return sendRequest(
-                ip,
-                WECHAT_REQUEST_URL_PATH,
-                null,
-                QianXunApiTypeEnum.GET_LOGIN_STATUS,
-                data -> new HashMap<>(), // 空data
-                QianXunLoginStatus.class
-        );
+    public  QianXunResponse<QianXunLoginStatus> getLoginStatus(String ip, String port){
+        // 构建请求URL
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://" + ip + ":" + port + WECHAT_REQUEST_URL_PATH);
+        String url = builder.toUriString();
+
+        try {
+            // 构建请求体
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("type", QianXunApiTypeEnum.GET_LOGIN_STATUS.getType());
+
+            // 发送POST请求
+            String responseStr = HttpUtils.post(url, new HashMap<>(), JsonUtils.toJsonString(requestBody));
+
+            // 检查空响应
+            if (responseStr == null || responseStr.trim().isEmpty()) {
+                throw new RuntimeException("服务器返回空响应");
+            }
+
+            // 解析响应
+            com.fasterxml.jackson.databind.JsonNode rootNode = JsonUtils.parseTree(responseStr);
+            int code = rootNode.path("code").asInt();
+            String msg = rootNode.path("msg").asText();
+            String timestamp = rootNode.path("timestamp").asText();
+            QianXunResponse<QianXunLoginStatus> response = new QianXunResponse<>();
+            response.setCode(code);
+            response.setMsg(msg);
+            response.setTimestamp(timestamp);
+            response.setWxid(rootNode.path("wxid").asText());
+            response.setPort(rootNode.path("port").asText());
+            response.setPid(rootNode.path("pid").asText());
+            response.setFlag(rootNode.path("flag").asText());
+
+            // 如果有data字段且状态码为200，解析data
+            if (code == 200 && rootNode.has("result")) {
+                // 创建包含所有字段的map
+                Map<String, Object> fullResult = new HashMap<>();
+
+                // 添加result中的字段
+                if (rootNode.has("result")) {
+                    Map<String, Object> resultMap = JsonUtils.parseObject(rootNode.path("result").toString(), Map.class);
+                    if (resultMap != null) {
+                        fullResult.putAll(resultMap);
+                    }
+                }
+
+                // 添加顶层字段
+                if (rootNode.has("wxid")) fullResult.put("wxid", rootNode.path("wxid").asText());
+                if (rootNode.has("port")) fullResult.put("port", rootNode.path("port").asInt());
+                if (rootNode.has("pid")) fullResult.put("pid", rootNode.path("pid").asInt());
+                if (rootNode.has("flag")) fullResult.put("flag", rootNode.path("flag").asText());
+                if (rootNode.has("timestamp"))
+                    fullResult.put("startTimeStamp", rootNode.path("timestamp").asText());
+
+                // 使用map创建QianXunLoginStatus对象
+                QianXunLoginStatus loginStatus = JsonUtils.parseObject(JsonUtils.toJsonString(fullResult), QianXunLoginStatus.class);
+                response.setResult(loginStatus);
+            }  else {
+                throw ServiceExceptionUtil.exception(QianXunApiTypeEnum.GET_LOGIN_STATUS.getErrorCode());
+            }
+
+            return response;
+        }catch (ServiceException e) {
+            // 直接抛出业务异常
+            throw e;
+        } catch (Exception e) {
+            log.error(QianXunApiTypeEnum.GET_LOGIN_STATUS.getErrorMessage(), e);
+            return QianXunResponse.error(500, QianXunApiTypeEnum.GET_LOGIN_STATUS.getErrorMessage() + e.getMessage());
+        }
     }
 
     /**
@@ -840,6 +898,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      *
      * @param <T> 数组元素类型
      * @param ip 服务器地址
+     * @param path 请求路径
      * @param wxid 微信ID
      * @param apiType API类型
      * @param dataBuilder 数据构建器
@@ -874,6 +933,7 @@ public class QXunWrapperImpl implements QXunWrapper {
      *
      * @param <R> 响应数据类型
      * @param ip 服务器地址
+     * @param path 请求路径
      * @param wxid 微信ID
      * @param apiType API类型
      * @param dataBuilder 数据构建器
@@ -931,7 +991,7 @@ public class QXunWrapperImpl implements QXunWrapper {
             response.setPid(rootNode.path("pid").asText());
             response.setFlag(rootNode.path("flag").asText());
 
-            // 如果有data字段且状态码为200，解析data
+            // 如果有result字段且状态码为200，解析result
             if (code == 200 && rootNode.has("result")) {
                 R result = responseProcessor.apply(rootNode.path("result"));
                 response.setResult(result);
