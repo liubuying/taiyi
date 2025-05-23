@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryDTO;
 import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
@@ -155,7 +156,6 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
     }
 
     List<WxFriendDO> getWxFriendGroupFromQx(String wxid, Integer type){
-        Long loginUserId = getLoginUserId();
         //todo  1.调用千寻接口（好友、群聊）
         String ip = "192.168.50.23";
         List<WxFriendDO> friendList = new ArrayList<>();
@@ -184,8 +184,9 @@ public class WxFriendRespositoryImpl implements WxFriendRespository {
         }
 
         friendList.forEach(friend  -> {
+            LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
             friend.setCreatorId(getLoginUserId());
-            friend.setTenantId((SecurityFrameworkUtils.getLoginUser().getTenantId()));
+            friend.setTenantId(loginUser == null ? 0 : SecurityFrameworkUtils.getLoginUser().getTenantId());
             friend.setWxPersonId(wxid);
             friend.setType(type);
         });
