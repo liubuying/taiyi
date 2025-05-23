@@ -32,7 +32,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
             "  </if>" +
             "AND tenant_id = #{tenantId}" +
             "</where>" +
-            "ORDER BY update_time DESC " +
+            "ORDER BY gmt_create DESC " +
             "LIMIT #{offset}, #{pageSize}" +
             "</script>")
     List<WxFriendVO> queryFriendDataList(@Param("nick")String  nick,@Param("wxId")String  wxId, @Param("type")String  type,@Param("tenantId") String tenantId, @Param("offset") int offset, @Param("pageSize") int pageSize);
@@ -56,7 +56,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
             "  </if>" +
             "AND tenant_id = #{tenantId}" +
             "</where>" +
-            "ORDER BY update_time DESC " +
+            "ORDER BY gmt_create DESC " +
             "</script>")
    Long queryFriendDataListCount(@Param("nick")String  nick,@Param("wxId")String  wxId, @Param("type")String  type,@Param("tenantId") String tenantId);
 
