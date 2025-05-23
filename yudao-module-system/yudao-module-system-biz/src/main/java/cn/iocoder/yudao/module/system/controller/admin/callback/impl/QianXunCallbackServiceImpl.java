@@ -29,12 +29,14 @@ import java.util.*;
 import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants.REDIS_PORT_KEY_PREFIX;
 
+@Service("QianXunCallbackService")
 @Slf4j
 public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
