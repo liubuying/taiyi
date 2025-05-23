@@ -30,7 +30,7 @@ public class WxSendServiceImpl implements WxSendService {
 
 
     @Override
-    public CommonResult sendMessageText(WxSendDTO dto) {
+    public CommonResult<?> sendMessageText(WxSendDTO dto) {
         WxSendDO wxSendDO=  BeanUtils.toBean(dto,WxSendDO.class);
         wxSendDO.setSendStatus(SendStatusEnum.SENDING.getCode());
          ///to do 三方发消息
