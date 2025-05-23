@@ -24,7 +24,7 @@ import java.util.List;
 
 @Service("WxSendService")
 @Slf4j
-public abstract class WxSendServiceImpl implements WxSendService {
+public  class WxSendServiceImpl implements WxSendService {
     @Resource
     private WxSendMapper wxSendMapper;
 
