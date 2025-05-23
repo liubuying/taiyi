@@ -9,4 +9,6 @@ public interface WxFriendRespository {
     CommonResult<PageResult<WxFriendVO>> queryFriendDataList(WxQueryDTO dto);
 
     void refreshWxFriendFromQianxun(String wxid);
+
+    void deleteFriend(String toWxId);
 }

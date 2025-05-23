@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.wx.WxFriendDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -62,4 +63,7 @@ public interface WxFriendMapper extends BaseMapper<WxFriendDO> {
     default List<WxFriendDO> selectListByWxPersonId(String  wxId){
         return this.selectList(new LambdaQueryWrapper<WxFriendDO>().eq(WxFriendDO::getWxPersonId, wxId));
     }
+
+    @Delete("DELETE FROM taiyi_wx_friend_info WHERE wx_id = #{toWxId}")
+    int deleteFriend(@Param("toWxId") String toWxId);
 }

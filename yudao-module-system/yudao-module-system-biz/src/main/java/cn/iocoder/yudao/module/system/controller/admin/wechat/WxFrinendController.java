@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.controller.admin.wechat;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.system.api.wx.WxDeleteDTO;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxMessageVo;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryDTO;
 import cn.iocoder.yudao.module.system.api.wx.dto.WxQueryMessageDTO;
@@ -9,6 +10,7 @@ import cn.iocoder.yudao.module.system.api.wx.dto.WxSendDTO;
 import cn.iocoder.yudao.module.system.api.wx.vo.WxFriendVO;
 import cn.iocoder.yudao.module.system.service.wx.WxFriendService;
 import cn.iocoder.yudao.module.system.service.wx.WxSendService;
+import cn.iocoder.yudao.module.system.wrapper.qianxun.QXunWrapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,9 @@ public class WxFrinendController {
 
     @Resource
     private WxSendService wxSendService;
+
+
+
 
 
     /**
@@ -66,6 +71,18 @@ public class WxFrinendController {
     @PostMapping("/queryMsgList")
     public CommonResult<List<WxMessageVo>> queryMsgList(@RequestBody WxQueryMessageDTO dto) {
         return wxSendService.queryMsgList(dto);
+    }
+
+
+
+    /**
+     * 好友 删除好友
+     * author zhangbin
+     */
+    @PermitAll
+    @PostMapping("/deleteFriend")
+    public CommonResult<?> deleteFriend(@RequestBody WxDeleteDTO dto) {
+        return wxFriendService.deleteFriend(dto);
     }
 
 
