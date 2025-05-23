@@ -891,7 +891,7 @@ public class QXunWrapperImpl implements QXunWrapper {
 
         try {
             // 构建请求URL
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(ip + path);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://"+ ip + path);
             if (wxid != null && !wxid.isEmpty()) {
                 builder.queryParam("wxid", wxid);
             }

@@ -22,9 +22,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-@Service("WxSendService")
+@Service
 @Slf4j
-public  class WxSendServiceImpl implements WxSendService {
+public class WxSendServiceImpl implements WxSendService {
     @Resource
     private WxSendMapper wxSendMapper;
 

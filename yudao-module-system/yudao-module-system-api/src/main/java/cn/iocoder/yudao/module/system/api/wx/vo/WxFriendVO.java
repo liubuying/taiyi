@@ -12,8 +12,6 @@ public class WxFriendVO {
 
     private Integer type; //类型 1 好友 2群聊
 
-    private String groupNumber; //类型 1 好友 2群聊
-
     private Integer groupNumberCount;  //群成员数量
 
     private String groupManger;  //群主微信id
