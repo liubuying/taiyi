@@ -46,10 +46,6 @@ public class WxSendDO {
      */
     private Integer conversationId;
 
-    /**
-     * 消息类型(1:文本 2:图片 3:语音.. 4 链接 5名片 . 6引用发消息 7动态表情 8 小程序 9 音乐 10 聊天记录)
-     */
-    private Integer msgType;
 
     /**
      * 来源类型：1|私聊 2|群聊 3|公众号
@@ -57,19 +53,27 @@ public class WxSendDO {
     private Integer fromType;
 
     /**
+     * 消息类型(1:文本 2:图片 3:语音.. 4 链接 5名片 . 6引用发消息 7动态表情 8 小程序 9 音乐 10 聊天记录)
+     */
+    private Integer msgType;
+
+
+    /**
      * 消息内容
      */
     private String msgContext;
+
+    /**
+     * fromType=1时为好友wxid，fromType=2时为群wxid，fromType=3时公众号wxid
+     */
+    private String fromUser;
 
     /**
      * 是否引用
      */
     private Integer isUser;
 
-    /**
-     * fromType=1时为好友wxid，fromType=2时为群wxid，fromType=3时公众号wxid
-     */
-    private String fromUser;
+
 
     /**
      * 1:发送中 2:发送成功 3:发送失败 4:已读 5:撤回
