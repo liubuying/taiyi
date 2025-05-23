@@ -14,7 +14,7 @@ import java.util.List;
 public interface WxSendService {
 
 
-    CommonResult<?> sendMessageText(WxSendDTO dto);
+    CommonResult sendMessageText(WxSendDTO dto);
 
     CommonResult<List<WxMessageVo>> queryMsgList(WxQueryMessageDTO dto);
 

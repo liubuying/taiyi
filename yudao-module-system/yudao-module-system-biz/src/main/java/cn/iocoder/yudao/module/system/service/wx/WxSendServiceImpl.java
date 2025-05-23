@@ -22,15 +22,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-@Service("WxSendService")
+@Service
 @Slf4j
-public abstract class WxSendServiceImpl implements WxSendService {
+public class WxSendServiceImpl implements WxSendService {
     @Resource
     private WxSendMapper wxSendMapper;
 
 
     @Override
-    public CommonResult<?> sendMessageText(WxSendDTO dto) {
+    public CommonResult sendMessageText(WxSendDTO dto) {
         WxSendDO wxSendDO=  BeanUtils.toBean(dto,WxSendDO.class);
         wxSendDO.setSendStatus(SendStatusEnum.SENDING.getCode());
          ///to do 三方发消息
