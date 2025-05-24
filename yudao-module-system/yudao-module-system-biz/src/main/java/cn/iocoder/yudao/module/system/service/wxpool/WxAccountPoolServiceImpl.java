@@ -42,9 +42,14 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
         }
         WxAccountPool wxAccountPool = new WxAccountPool();
         BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
-        if (StringUtils.isNotBlank(wxAccountPoolVO.getExpireTime())) {
-            wxAccountPool.setExpireTime(DateUtils.of(wxAccountPoolVO.getExpireTime(), DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND));
+        try {
+            if (StringUtils.isNotBlank(wxAccountPoolVO.getExpireTime())) {
+                wxAccountPool.setExpireTime(DateUtils.of(wxAccountPoolVO.getExpireTime(), DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND));
+            }
+        }catch (Exception e){
+            log.error("保存微信池时间转换异常",e);
         }
+
         return wxAccountDomainRepository.saveWxAccountPool(wxAccountPool);
 
     }
