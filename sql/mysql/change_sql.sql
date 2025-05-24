@@ -1,3 +1,7 @@
+ALTER TABLE taiyi_db.taiyi_wx_account_pool MODIFY COLUMN creator_nick_name varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '创建人昵称';
+
+
+
 ALTER TABLE taiyi_db.taiyi_company ADD creator_id BIGINT NOT NULL COMMENT '创建人信息';
 ALTER TABLE taiyi_db.taiyi_company ADD operator_id BIGINT NULL COMMENT '操作人';
 

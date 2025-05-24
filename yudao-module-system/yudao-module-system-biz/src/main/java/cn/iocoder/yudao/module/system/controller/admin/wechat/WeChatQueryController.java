@@ -218,19 +218,17 @@ public class WeChatQueryController {
             }
             // 拼装 回调事件 请求参数
             CallBackReq<QianXunAccountChangeEvent> req = new CallBackReq<>();
-        /*    JSONObject jsonObject = new JSONObject();
-        jsonObject.put("event", request.getEventId());
-        jsonObject.put("wxid", request.getWxUnionId());
-        jsonObject.put("data", userInfo.getResult());*/
             req.setEvent(request.getEventId());
             req.setWxid(request.getWxUnionId());
             QianXunAccountChangeEvent qianXunAccountChangeEvent = new QianXunAccountChangeEvent();
             BeanUtils.copyProperties(userInfo.getResult(), qianXunAccountChangeEvent);
             qianXunAccountChangeEvent.setType(YesOrNoEnum.YES.getStatus().toString());
+            qianXunAccountChangeEvent.setUserId(getLoginUserId());
             if(StringUtils.isNumeric(userInfo.getPort())) {
                 qianXunAccountChangeEvent.setPort(Integer.valueOf(userInfo.getPort()));
             }
             req.setData(qianXunAccountChangeEvent);
+
             log.info("组装登录回调事件信息 ：{}", JSONObject.toJSONString(req));
             qianXunCallbackService.handleQianXunCallback(req);
             return CommonResult.success(true);

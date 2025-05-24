@@ -11,4 +11,6 @@ public abstract class AbstractEvent {
     private String timestamp;
 
     private String wxid;
+
+    private Long userId;
 }
