@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
@@ -173,7 +174,7 @@ public class WeChatQueryController {
             }
         }
         qianXunQrCodes.add(loginQrCode);
-        redisWrapper.setValue(key, JSON.toJSONString(qianXunQrCodes), 60 * 5);
+        redisWrapper.setValue(key, JSON.toJSONString(qianXunQrCodes), TimeUnit.MINUTES.toSeconds(5));
     }
 
     private List<DomainName> queryCompanyAllDomainUrl(Long companyId) {

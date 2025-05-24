@@ -109,18 +109,18 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository 
     }
 
     @Override
-    public void saveWxAccountPool(WxAccountPool wxAccountPool) {
+    public Long saveWxAccountPool(WxAccountPool wxAccountPool) {
         // 查询账号池信息
         WxAccountPoolDO wxAccountPoolDO = wxAccountPoolMapper.selectOne(WxAccountPoolDO::getUnionId, wxAccountPool.getUnionId());
         if (wxAccountPoolDO == null || wxAccountPoolDO.getId() == null) {
 
-            insertWxAccountPool(wxAccountPool);
+           return insertWxAccountPool(wxAccountPool);
         } else {
-            updateWxAccountPool(wxAccountPool, wxAccountPoolDO);
+           return updateWxAccountPool(wxAccountPool, wxAccountPoolDO);
         }
     }
 
-    private void insertWxAccountPool(WxAccountPool wxAccountPool) {
+    private Long insertWxAccountPool(WxAccountPool wxAccountPool) {
         WxAccountPoolDO wxAccountPoolDO = new WxAccountPoolDO();
         BeanUtils.copyProperties(wxAccountPool, wxAccountPoolDO);
         wxAccountPoolDO.setIsExpired(YesOrNoEnum.NO.getStatus());
@@ -128,15 +128,17 @@ public class WxAccountDomainRepositoryImpl implements WxAccountDomainRepository 
         wxAccountPoolDO.setCreatorNickName(wxAccountPool.getCreator().getUserName());
         // 默认为微信账号
         wxAccountPoolDO.setAccountType(wxAccountPool.getAccountType().getStatus());
-        wxAccountPoolMapper.insert(wxAccountPoolDO);
+        int insert = wxAccountPoolMapper.insert(wxAccountPoolDO);
+        return insert > 0 ? wxAccountPoolDO.getId() : null;
     }
 
-    private void updateWxAccountPool(WxAccountPool wxAccountPool, WxAccountPoolDO wxAccountPoolDO) {
+    private Long updateWxAccountPool(WxAccountPool wxAccountPool, WxAccountPoolDO wxAccountPoolDO) {
         wxAccountPoolDO.setOperatorId(wxAccountPool.getOperator().getUserId());
         wxAccountPoolDO.setOperatorNickName(wxAccountPool.getOperator().getUserName());
         BeanUtils.copyProperties(wxAccountPool, wxAccountPoolDO);
         wxAccountPoolDO.setAccountType(wxAccountPool.getAccountType().getStatus());
         wxAccountPoolMapper.updateById(wxAccountPoolDO);
+        return wxAccountPool.getId();
     }
 
     @Override

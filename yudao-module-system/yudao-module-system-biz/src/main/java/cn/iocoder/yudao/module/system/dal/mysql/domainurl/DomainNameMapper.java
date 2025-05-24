@@ -33,6 +33,7 @@ public interface DomainNameMapper extends BaseMapperX<DomainNameDO> {
                 .likeIfPresent(DomainNameDO::getDomainName, reqVO.getDomainName())
                 .eqIfPresent(DomainNameDO::getStatus, reqVO.getDomainStatus())
                 .eqIfPresent(DomainNameDO::getCompanyId, reqVO.getCompanyId())
+                .eqIfPresent(DomainNameDO::getDomain, reqVO.getDomain())
                 .eq(DomainNameDO::getDeleted, 0));
     }
 

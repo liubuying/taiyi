@@ -34,20 +34,21 @@ public class WxAccountPoolServiceImpl implements WxAccountPoolService{
     }
 
     @Override
-    public void saveWxAccountPool(WxAccountPoolVO wxAccountPoolVO) {
+    public Long saveWxAccountPool(WxAccountPoolVO wxAccountPoolVO) {
         log.info("添加/修改账号池数据, params:{}", JSON.toJSONString(wxAccountPoolVO));
         try {
             if(wxAccountPoolVO == null){
-                return;
+                return null;
             }
             WxAccountPool wxAccountPool = new WxAccountPool();
             BeanUtils.copyProperties(wxAccountPoolVO, wxAccountPool);
             if(StringUtils.isNotBlank(wxAccountPoolVO.getExpireTime())){
                 wxAccountPool.setExpireTime(DateUtils.of(wxAccountPoolVO.getExpireTime(), DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND));
             }
-            wxAccountDomainRepository.saveWxAccountPool(wxAccountPool);
+            return wxAccountDomainRepository.saveWxAccountPool(wxAccountPool);
         } catch (Exception e) {
             log.error("添加/修改账号池数据,params:{}",JSON.toJSONString(wxAccountPoolVO), e);
+            return null;
         }
     }
 

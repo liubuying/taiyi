@@ -41,15 +41,19 @@ public class WechatLoginRecordSaveReqVO {
     private String ip;
 
     @Schema(description = "登录时间")
-    private LocalDateTime loginTime;
+    private Date loginTime;
 
     @Schema(description = "创建时间")
-    private LocalDateTime gmtCreate;
+    private Date gmtCreate;
 
     @Schema(description = "修改时间")
-    private LocalDateTime gmtModified;
+    private Date gmtModified;
 
     @Schema(description = "是否下线（0-在线，1-下线）")
     private Boolean isOffline;
+
+    private Long creatorId;
+
+    private Long operatorId;
 
 }

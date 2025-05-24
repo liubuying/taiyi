@@ -17,7 +17,7 @@ public interface WxAccountDomainRepository {
     /**
      * 修改账号池数据接口
      */
-    void saveWxAccountPool(WxAccountPool wxAccountPool);
+    Long saveWxAccountPool(WxAccountPool wxAccountPool);
 
 
     /**

@@ -17,7 +17,7 @@ public interface WxAccountPoolService {
      */
     PageResult<WxAccountPool> queryWxAccountPoolForPage(WxAccountPoolRequest wxAccountPoolRequest);
 
-    void saveWxAccountPool(WxAccountPoolVO wxAccountPoolVO);
+    Long saveWxAccountPool(WxAccountPoolVO wxAccountPoolVO);
 
     void deleteWxAccountPool(WxAccountPoolVO wxAccountPoolVO);
 

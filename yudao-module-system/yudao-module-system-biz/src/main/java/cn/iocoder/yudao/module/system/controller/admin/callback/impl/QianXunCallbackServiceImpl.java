@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -134,7 +135,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
         boolean handledSuccessfully = false;
         try {
-            if (YesOrNoEnum.YES.getStatus().equals(type)) { // 登录事件
+            if (YesOrNoEnum.YES.getStatus().equals(Integer.valueOf(type))) { // 登录事件
                 handleLogin(wxid, port, serverIp, data);
                 handledSuccessfully = true;
             } else { // 登出事件
@@ -156,6 +157,7 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
     @Transactional(rollbackFor = Exception.class)
     private void handleLogin(String wxid, Integer port, String serverIp, QianXunAccountChangeEvent data) {
         log.info("处理微信登录事件: wxid={}, port={}, serverIp={}", wxid, port, serverIp);
+
 
         // 查询域名数据
         DomainNameRequest domainNameRequest = new DomainNameRequest();
@@ -184,29 +186,27 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
 
         addWechatLoginRecord(wxid, serverIp, port, data);
 
+        Long id = 0L;
         if(!existingWxPool(wxid)){
-            addAccountPool(wxid, data);
+            id = addAccountPool(wxid, data);
         }
 
         // 在查询一遍数据
         WxAccountPoolRequest request = new WxAccountPoolRequest();
         request.setUnionId(wxid);
-        PageResult<WxAccountPool> result = wxAccountPoolService.queryWxAccountPoolForPage(request);
-
         // 绑定微信ID和IP
         WxAccountPoolVO bindWxAccountPoolVO = new WxAccountPoolVO();
         bindWxAccountPoolVO.setDomainName(domainName);
-        bindWxAccountPoolVO.setId(result.getList().get(0).getId());
         bindWxAccountPoolVO.setUnionId(wxid);
         bindWxAccountPoolVO.setCreator(DEFAULT_USER_INFO);
         wxAccountPoolService.bindDomainUrl(bindWxAccountPoolVO);
         log.info("已绑定微信ID{}与IP{}", wxid, serverIp);
 
         // 同步好友和群信息
-        wxFriendService.refreshWxFriendFromQianxun(wxid);
+        // wxFriendService.refreshWxFriendFromQianxun(wxid);
     }
 
-    private void addAccountPool(String wxid, QianXunAccountChangeEvent data) {
+    private Long addAccountPool(String wxid, QianXunAccountChangeEvent data) {
         // 保存到微信公共池
         WxAccountPoolVO accountPool = new WxAccountPoolVO();
         accountPool.setDeleted(YesOrNoEnum.NO.getStatus());
@@ -219,8 +219,9 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         accountPool.setIsExpired(YesOrNoEnum.NO); // 未过期
         accountPool.setCreator(DEFAULT_USER_INFO); // 根据业务设置正确的操作员ID
 
-        wxAccountPoolService.saveWxAccountPool(accountPool);
+        Long id = wxAccountPoolService.saveWxAccountPool(accountPool);
         log.info("已保存微信ID{}到公共池", wxid);
+        return id;
     }
 
     private Boolean existingWxPool(String wxid) {
@@ -238,8 +239,12 @@ public class QianXunCallbackServiceImpl implements QianXunCallbackService {
         newRecord.setNickname(data.getNick());
         newRecord.setIp(serverIp);
         newRecord.setPort(port);
-        newRecord.setLoginTime(LocalDateTime.now());
+        Date date = new Date();
+        newRecord.setLoginTime(date);
         newRecord.setIsOffline(false);
+        newRecord.setGmtCreate(date);
+        newRecord.setGmtModified(date);
+        newRecord.setCreatorId(0L);
         wechatLoginRecordService.createWechatLoginRecord(newRecord);
         log.info("已创建微信ID{}的新登录记录", wxid);
     }
